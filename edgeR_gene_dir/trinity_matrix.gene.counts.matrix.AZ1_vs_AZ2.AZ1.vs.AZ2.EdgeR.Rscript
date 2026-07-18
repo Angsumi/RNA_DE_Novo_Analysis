@@ -1,0 +1,22 @@
+library(edgeR)
+
+data = read.table("/home/angsuman/rna_pipeline/trinity_output/trinity_matrix.gene.counts.matrix", header=T, row.names=1, com='')
+col_ordering = c(1,2)
+rnaseqMatrix = data[,col_ordering]
+rnaseqMatrix = round(rnaseqMatrix)
+rnaseqMatrix = rnaseqMatrix[rowSums(cpm(rnaseqMatrix) > 1) >= 2,]
+conditions = factor(c(rep("AZ1", 1), rep("AZ2", 1)))
+
+exp_study = DGEList(counts=rnaseqMatrix, group=conditions)
+exp_study = calcNormFactors(exp_study)
+et = exactTest(exp_study, pair=c("AZ1", "AZ2"), dispersion=0.1)
+tTags = topTags(et,n=NULL)
+result_table = tTags$table
+result_table = data.frame(sampleA="AZ1", sampleB="AZ2", result_table)
+result_table$logFC = -1 * result_table$logFC
+write.table(result_table, file='trinity_matrix.gene.counts.matrix.AZ1_vs_AZ2.edgeR.DE_results', sep='	', quote=F, row.names=T)
+write.table(rnaseqMatrix, file='trinity_matrix.gene.counts.matrix.AZ1_vs_AZ2.edgeR.count_matrix', sep='	', quote=F, row.names=T)
+source("/home/angsuman/miniconda3/opt/trinity-2.5.1/Analysis/DifferentialExpression/R/rnaseq_plot_funcs.R")
+pdf("trinity_matrix.gene.counts.matrix.AZ1_vs_AZ2.edgeR.DE_results.MA_n_Volcano.pdf")
+plot_MA_and_Volcano(rownames(result_table), result_table$logCPM, result_table$logFC, result_table$FDR)
+dev.off()

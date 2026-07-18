@@ -1,0 +1,17 @@
+# Ignore large raw sequences
+*.fasta
+*.faa
+
+# Ignore expression matrices
+*.matrix
+
+# Ignore large Salmon quantification directories (since quant.sf tables are too large for GitHub)
+salmon_out/
+
+# Ignore large intermediate BUSCO databases
+busco_results/*/
+busco_results/tmp/
+!busco_results/short_summary.txt
+
+# Ignore log files that might be too large (already copied to Scripts_and_Logs anyway)
+*.log
