@@ -1,0 +1,31 @@
+GO_ID	Ontology	Term_Description	Counts
+GO:0005634	cellular_component	nucleus	45
+GO:0005739	cellular_component	mitochondrion	45
+GO:0015074	biological_process	DNA integration	34
+GO:0043457	biological_process	regulation of cellular respiration	34
+GO:0004519	molecular_function	endonuclease activity	31
+GO:0008270	molecular_function	zinc ion binding	30
+GO:0046975	molecular_function	histone H3K36 methyltransferase activity	29
+GO:0003964	molecular_function	RNA-directed DNA polymerase activity	21
+GO:0005737	cellular_component	cytoplasm	21
+GO:0003723	molecular_function	RNA binding	20
+GO:0004190	molecular_function	aspartic-type endopeptidase activity	19
+GO:0006508	biological_process	proteolysis	19
+GO:0035861	cellular_component	site of double-strand break	19
+GO:0003677	molecular_function	DNA binding	19
+GO:0044547	molecular_function	DNA topoisomerase binding	19
+GO:0003690	molecular_function	double-stranded DNA binding	19
+GO:0042800	molecular_function	histone H3K4 methyltransferase activity	19
+GO:0003697	molecular_function	single-stranded DNA binding	19
+GO:0000014	molecular_function	single-stranded DNA endonuclease activity	19
+GO:0000729	biological_process	DNA double-strand break processing	19
+GO:0006303	biological_process	double-strand break repair via nonhomologous end joining	19
+GO:0044774	biological_process	mitotic DNA integrity checkpoint signaling	19
+GO:0031297	biological_process	replication fork processing	19
+GO:0005829	cellular_component	cytosol	17
+GO:0046872	molecular_function	metal ion binding	17
+GO:1990904	cellular_component	ribonucleoprotein complex	17
+GO:0030425	cellular_component	dendrite	16
+GO:0003676	molecular_function	nucleic acid binding	16
+GO:0005730	cellular_component	nucleolus	16
+GO:0140954	molecular_function	histone H3K36 dimethyltransferase activity	16
