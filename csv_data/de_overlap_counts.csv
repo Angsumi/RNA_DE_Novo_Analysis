@@ -1,0 +1,9 @@
+Comparison_Group,Gene_Count
+AZ1_vs_AZ2_Only,145
+AZ1_vs_AZ3_Only,57
+AZ2_vs_AZ3_Only,95
+Shared_AZ1_vs_AZ2_AND_AZ1_vs_AZ3,13
+Shared_AZ1_vs_AZ2_AND_AZ2_vs_AZ3,90
+Shared_AZ1_vs_AZ3_AND_AZ2_vs_AZ3,31
+Shared_All_Three,1
+Total_Unique_DE_Genes,432
