@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>De Novo RNA-Seq Transcriptome Assembly & Differential Expression Analysis | Results & Visualizations</title>
-    <meta name="description" content="Comprehensive interactive report, publication figures, quality control metrics, and differential expression suite across conditions AZ1, AZ2, and AZ3.">
+    <title>De Novo RNA-Seq Transcriptome Analysis & Differential Expression Suite | MD Studio</title>
+    <meta name="description" content="Comprehensive De Novo Transcriptome Assembly, Salmon Abundance Quantification, edgeR Differential Expression, Trinotate Annotation, and Publication Visualizations across AZ1, AZ2, and AZ3.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            /* Base Obsidian Palette */
+            /* Base Obsidian Dark Theme */
             --bg-base: #090d16;
             --bg-card: rgba(18, 24, 39, 0.75);
             --bg-card-hover: rgba(24, 33, 53, 0.90);
@@ -39,18 +39,18 @@
             --inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
             --card-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.55);
             
-            /* Status Colors */
-            --status-success-bg: rgba(16, 185, 129, 0.12);
-            --status-success-text: #34d399;
-            --status-success-border: rgba(52, 211, 153, 0.28);
+            /* Status Badges */
+            --badge-success-bg: rgba(16, 185, 129, 0.12);
+            --badge-success-text: #34d399;
+            --badge-success-border: rgba(52, 211, 153, 0.28);
             
-            --status-warning-bg: rgba(245, 158, 11, 0.12);
-            --status-warning-text: #fbbf24;
-            --status-warning-border: rgba(251, 191, 36, 0.28);
+            --badge-warning-bg: rgba(245, 158, 11, 0.12);
+            --badge-warning-text: #fbbf24;
+            --badge-warning-border: rgba(251, 191, 36, 0.28);
             
-            --status-info-bg: rgba(6, 182, 212, 0.12);
-            --status-info-text: #38bdf8;
-            --status-info-border: rgba(56, 189, 248, 0.28);
+            --badge-info-bg: rgba(6, 182, 212, 0.12);
+            --badge-info-text: #38bdf8;
+            --badge-info-border: rgba(56, 189, 248, 0.28);
         }
 
         * {
@@ -141,7 +141,7 @@
 
         /* Container */
         .container {
-            max-width: 1320px;
+            max-width: 1380px;
             margin: 0 auto;
             padding: 2.5rem 1.5rem 5rem 1.5rem;
         }
@@ -149,7 +149,7 @@
         /* Hero Section */
         .hero {
             text-align: center;
-            padding: 3rem 1rem 3.5rem 1rem;
+            padding: 2.5rem 1rem 3rem 1rem;
             position: relative;
         }
         .hero-badge {
@@ -178,19 +178,19 @@
             -webkit-text-fill-color: transparent;
         }
         .hero-subtitle {
-            font-size: 1.15rem;
+            font-size: 1.12rem;
             color: var(--text-secondary);
-            max-width: 860px;
+            max-width: 900px;
             margin: 0 auto 2.5rem auto;
             line-height: 1.7;
         }
 
-        /* Quick Metric Ribbon */
+        /* Metrics Grid */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
             gap: 1.25rem;
-            margin-bottom: 3.5rem;
+            margin-bottom: 3rem;
         }
         .metric-card {
             background: var(--bg-card);
@@ -275,10 +275,10 @@
             box-shadow: 0 4px 14px var(--accent-glow);
         }
 
-        /* Tier / Section Header */
+        /* Section Titles */
         .section-header {
-            margin: 4rem 0 1.8rem 0;
-            padding-bottom: 0.9rem;
+            margin: 4.5rem 0 1.5rem 0;
+            padding-bottom: 0.8rem;
             border-bottom: 1px solid var(--border-hairline);
             display: flex;
             align-items: center;
@@ -317,7 +317,126 @@
             margin-top: -0.3rem;
         }
 
-        /* Visual Cards Grid */
+        /* Matrix Data Table (Inspired by MD-chakra) */
+        .matrix-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hairline);
+            border-radius: 18px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(14px);
+            margin-bottom: 3.5rem;
+            overflow: hidden;
+        }
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+        .matrix-table thead {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .matrix-table th {
+            padding: 1rem 1.1rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 0.76rem;
+            border-bottom: 1px solid var(--border-hairline);
+            white-space: nowrap;
+        }
+        .matrix-table td {
+            padding: 1.1rem 1.1rem;
+            border-bottom: 1px solid var(--border-hairline);
+            vertical-align: middle;
+        }
+        .matrix-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.025);
+        }
+        .item-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            font-weight: 400;
+        }
+        .code-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.08);
+            padding: 0.2rem 0.45rem;
+            border-radius: 5px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        
+        /* Status Badges */
+        .badge-success {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            background: var(--badge-success-bg);
+            color: var(--badge-success-text);
+            border: 1px solid var(--badge-success-border);
+            white-space: nowrap;
+        }
+        .badge-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            background: var(--badge-info-bg);
+            color: var(--badge-info-text);
+            border: 1px solid var(--badge-info-border);
+            white-space: nowrap;
+        }
+
+        /* Action Buttons */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            align-items: center;
+        }
+        .btn-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.75rem;
+            background: var(--accent-gradient);
+            border: 1px solid transparent;
+            border-radius: 7px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-sm:hover {
+            box-shadow: 0 4px 12px var(--accent-glow);
+            transform: translateY(-1px);
+        }
+        .btn-sm.btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-hairline);
+            color: var(--text-secondary);
+        }
+        .btn-sm.btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-primary);
+            border-color: var(--accent-indigo);
+        }
+
+        /* Visualizations Section at the Bottom */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
@@ -329,7 +448,6 @@
                 grid-template-columns: 1fr;
             }
         }
-
         .viz-card {
             background: var(--bg-card);
             border: 1px solid var(--border-hairline);
@@ -352,7 +470,7 @@
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
-            margin-bottom: 1rem;
+            margin-bottom: 0.85rem;
             gap: 0.75rem;
         }
         .viz-title {
@@ -390,12 +508,6 @@
         .viz-img-wrap:hover img {
             transform: scale(1.02);
         }
-        .viz-badge-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
         .tag-badge {
             font-size: 0.72rem;
             font-weight: 600;
@@ -406,6 +518,12 @@
             border: 1px solid var(--border-hairline);
             color: var(--text-secondary);
         }
+        .viz-badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
         .viz-actions {
             display: flex;
             align-items: center;
@@ -414,120 +532,8 @@
             border-top: 1px solid var(--border-hairline);
             gap: 0.75rem;
         }
-        .action-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.45rem 0.9rem;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-hairline);
-            border-radius: 8px;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .action-btn:hover {
-            background: var(--accent-gradient);
-            border-color: transparent;
-            color: #fff;
-        }
-        .action-btn.secondary {
-            color: var(--text-secondary);
-        }
-        .action-btn.secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
 
-        /* Interactive Data Table Component */
-        .table-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-hairline);
-            border-radius: 18px;
-            padding: 1.5rem;
-            box-shadow: var(--card-shadow);
-            backdrop-filter: blur(14px);
-            margin-bottom: 2.5rem;
-            overflow: hidden;
-        }
-        .table-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.25rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .search-input {
-            padding: 0.6rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-hairline);
-            background: rgba(0, 0, 0, 0.4);
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 0.85rem;
-            width: 320px;
-            max-width: 100%;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .search-input:focus {
-            border-color: var(--accent-indigo);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            border-radius: 10px;
-            border: 1px solid var(--border-hairline);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.85rem;
-        }
-        thead {
-            background: rgba(255, 255, 255, 0.04);
-        }
-        th {
-            padding: 0.9rem 1.1rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.75rem;
-            border-bottom: 1px solid var(--border-hairline);
-            white-space: nowrap;
-        }
-        td {
-            padding: 0.85rem 1.1rem;
-            border-bottom: 1px solid var(--border-hairline);
-            color: var(--text-primary);
-        }
-        tbody tr:hover {
-            background: rgba(255, 255, 255, 0.025);
-        }
-        .code-cell {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: #38bdf8;
-        }
-        .status-pill {
-            display: inline-block;
-            padding: 0.25rem 0.65rem;
-            border-radius: 9999px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-        }
-        .pill-success { background: var(--status-success-bg); color: var(--status-success-text); border: 1px solid var(--status-success-border); }
-        .pill-warning { background: var(--status-warning-bg); color: var(--status-warning-text); border: 1px solid var(--status-warning-border); }
-        .pill-info { background: var(--status-info-bg); color: var(--status-info-text); border: 1px solid var(--status-info-border); }
-
-        /* Fullscreen Image Lightbox Modal */
+        /* Fullscreen Lightbox Modal */
         .modal {
             display: none;
             position: fixed;
@@ -536,8 +542,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(9, 13, 22, 0.92);
-            backdrop-filter: blur(12px);
+            background: rgba(9, 13, 22, 0.94);
+            backdrop-filter: blur(14px);
             align-items: center;
             justify-content: center;
             padding: 2rem;
@@ -546,11 +552,11 @@
             display: flex;
         }
         .modal-content {
-            max-width: 90vw;
-            max-height: 85vh;
+            max-width: 92vw;
+            max-height: 88vh;
             border-radius: 14px;
             border: 1px solid var(--border-highlight);
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            box-shadow: 0 0 50px rgba(0,0,0,0.85);
             background: #090d16;
             padding: 0.5rem;
         }
@@ -575,7 +581,7 @@
             text-align: center;
             color: var(--text-muted);
             font-size: 0.85rem;
-            background: rgba(9, 13, 22, 0.6);
+            background: rgba(9, 13, 22, 0.7);
         }
         footer a {
             color: var(--accent-cyan);
@@ -596,10 +602,9 @@
         </a>
         <ul class="nav-links">
             <li><a href="#overview">Overview</a></li>
-            <li><a href="#tier-1">QC & Assembly</a></li>
-            <li><a href="#tier-2">Expression & DE</a></li>
-            <li><a href="#tier-3">Annotation & Mining</a></li>
-            <li><a href="#deliverables">Data Tables</a></li>
+            <li><a href="#matrix-table">Master Matrix</a></li>
+            <li><a href="#suite-visualizations">Visualizations</a></li>
+            <li><a href="#deliverables">Deliverables</a></li>
         </ul>
         <a href="https://github.com/Angsumi/RNA_DE_Novo_Analysis" target="_blank" class="github-btn">
             <i class="fa-brands fa-github"></i>
@@ -612,11 +617,11 @@
         <header class="hero">
             <div class="hero-badge">
                 <i class="fa-solid fa-microscope"></i>
-                Transcriptomics & Differential Expression Portal
+                Transcriptomics & Differential Expression Suite
             </div>
-            <h1>De Novo Transcriptome Assembly & DE Suite</h1>
+            <h1>De Novo Transcriptome & Expression Matrix</h1>
             <p class="hero-subtitle">
-                Complete expression profiling, comparative differential expression, orthology completeness benchmarking, and functional annotations across conditions <strong>AZ1</strong>, <strong>AZ2</strong>, and <strong>AZ3</strong>.
+                Comprehensive status breakdown, analytical pipelines, and direct download directory for all transcriptomic deliverables, differential expression results, and functional profiling modules across <strong>AZ1</strong>, <strong>AZ2</strong>, and <strong>AZ3</strong>.
             </p>
         </header>
 
@@ -664,479 +669,581 @@
             </div>
         </section>
 
-        <!-- Navigation Jump Links -->
+        <!-- Jump Links -->
         <nav class="quick-nav">
-            <a href="#tier-1"><i class="fa-solid fa-vial"></i> Tier 1: Assembly QC & Completeness</a>
-            <a href="#tier-2"><i class="fa-solid fa-chart-line"></i> Tier 2: Differential Expression & Clustering</a>
-            <a href="#tier-3"><i class="fa-solid fa-shapes"></i> Tier 3: Functional Annotation & Pathways</a>
-            <a href="#tier-4"><i class="fa-solid fa-table"></i> Tier 4: Master Expression & Isoform Switching</a>
+            <a href="#matrix-table"><i class="fa-solid fa-table-cells"></i> Master Analysis & Results Matrix</a>
+            <a href="#suite-visualizations"><i class="fa-solid fa-chart-area"></i> Visualizations Suite (Figures 1-7)</a>
+            <a href="#isoform-section"><i class="fa-solid fa-shuffle"></i> Isoform Switching Candidates</a>
+            <a href="https://github.com/Angsumi/RNA_DE_Novo_Analysis" target="_blank"><i class="fa-brands fa-github"></i> GitHub Source Code</a>
         </nav>
 
-        <!-- ================= Tier 1 ================= -->
-        <div class="section-header" id="tier-1">
+
+        <!-- ================= MASTER ANALYSIS & RESULTS MATRIX (Rows & Columns) ================= -->
+        <div class="section-header" id="matrix-table">
             <div class="section-title-wrap">
-                <span class="tier-badge tier-1-badge">Tier 1</span>
-                <h2 class="section-title">Assembly Quality Control & Benchmarking</h2>
+                <span class="tier-badge tier-1-badge">Core Matrix</span>
+                <h2 class="section-title">Master Analysis & Results Feasibility Matrix</h2>
             </div>
-            <p class="section-desc">Assessment of transcript contiguity, evolutionary completeness benchmarking (BUSCO), and alignment rates.</p>
+            <p class="section-desc">Comprehensive rows and columns covering assembly, abundance quantification, differential expression, and functional annotations.</p>
+        </div>
+
+        <div class="matrix-container">
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th style="width: 280px;">Analysis / Deliverable</th>
+                        <th style="width: 170px;">Status</th>
+                        <th>Methodology & Analytical Implementation</th>
+                        <th style="width: 290px;">Direct Deliverables / Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Item 1: Assembly Statistics -->
+                    <tr>
+                        <td><strong>1</strong></td>
+                        <td>
+                            <strong>De Novo Transcriptome Assembly</strong>
+                            <div class="item-desc">Trinity de Bruijn graph contig assembly</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Assembled with <span class="code-tag">Trinity --seqType fq --max_memory 120G</span> yielding 2,682,805 genes and 2,944,151 transcripts (N50: 363 bp, 1.07 Gbp).</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="data/qc/TrinityStats.txt" class="btn-sm btn-secondary" target="_blank"><i class="fa-solid fa-file-lines"></i> TrinityStats.txt</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 2: BUSCO Completeness -->
+                    <tr>
+                        <td><strong>2</strong></td>
+                        <td>
+                            <strong>BUSCO Quality Benchmarking</strong>
+                            <div class="item-desc">Ortholog evolutionary completeness</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Evaluated via <span class="code-tag">busco -m transcriptome --auto-lineage-euk</span> (eukaryota_odb12.2, 125 orthologs). 68.0% Complete (41.6% Single, 26.4% Duplicated).</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/busco_completeness_percentages.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> BUSCO CSV</a>
+                                <a href="data/qc/busco_results/short_summary.specific.eukaryota_odb12.2.busco_results.txt" class="btn-sm btn-secondary" target="_blank">Summary .txt</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 3: Mapping & Abundance -->
+                    <tr>
+                        <td><strong>3</strong></td>
+                        <td>
+                            <strong>Salmon Abundance Quantification</strong>
+                            <div class="item-desc">Mapping efficiency across AZ1, AZ2, AZ3</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Quasi-index mapping with <span class="code-tag">salmon quant -k 31 -p 12</span>. Alignment: AZ1 (80.37%), AZ2 (79.47%), AZ3 (80.28%).</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="scripts/02_quantification/run_salmon_manual.sh" class="btn-sm btn-secondary" target="_blank"><i class="fa-solid fa-code"></i> Salmon Script</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 4: Pairwise Gene DE (AZ1 vs AZ2) -->
+                    <tr>
+                        <td><strong>4</strong></td>
+                        <td>
+                            <strong>AZ1 vs AZ2 Differential Expression</strong>
+                            <div class="item-desc">Gene and isoform pairwise contrast</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Negative binomial GLM via <span class="code-tag">edgeR (dispersion=0.1)</span>. Identified 993 DE genes (441 with |log2FC| &gt; 2, FDR &lt; 0.05).</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/AZ1_vs_AZ2_gene_DE_results.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> Gene CSV</a>
+                                <a href="results/tables/csv/AZ1_vs_AZ2_isoform_DE_results.csv" class="btn-sm btn-secondary" download>Isoform CSV</a>
+                                <a href="data/differential_expression/gene_level/trinity_matrix.gene.counts.matrix.AZ1_vs_AZ2.edgeR.DE_results.MA_n_Volcano.pdf" class="btn-sm btn-secondary" target="_blank"><i class="fa-solid fa-file-pdf"></i> Volcano PDF</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 5: Pairwise Gene DE (AZ1 vs AZ3) -->
+                    <tr>
+                        <td><strong>5</strong></td>
+                        <td>
+                            <strong>AZ1 vs AZ3 Differential Expression</strong>
+                            <div class="item-desc">Gene and isoform pairwise contrast</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>EdgeR exact test with fixed biological coefficient of variation. Identified 1,103 DE genes (417 with |log2FC| &gt; 2).</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/AZ1_vs_AZ3_gene_DE_results.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> Gene CSV</a>
+                                <a href="results/tables/csv/AZ1_vs_AZ3_isoform_DE_results.csv" class="btn-sm btn-secondary" download>Isoform CSV</a>
+                                <a href="data/differential_expression/gene_level/trinity_matrix.gene.counts.matrix.AZ1_vs_AZ3.edgeR.DE_results.MA_n_Volcano.pdf" class="btn-sm btn-secondary" target="_blank"><i class="fa-solid fa-file-pdf"></i> Volcano PDF</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 6: Pairwise Gene DE (AZ2 vs AZ3) -->
+                    <tr>
+                        <td><strong>6</strong></td>
+                        <td>
+                            <strong>AZ2 vs AZ3 Differential Expression</strong>
+                            <div class="item-desc">Gene and isoform pairwise contrast</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>EdgeR pairwise contrast between conditions AZ2 and AZ3. Identified 839 DE genes (453 with |log2FC| &gt; 2).</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/AZ2_vs_AZ3_gene_DE_results.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> Gene CSV</a>
+                                <a href="results/tables/csv/AZ2_vs_AZ3_isoform_DE_results.csv" class="btn-sm btn-secondary" download>Isoform CSV</a>
+                                <a href="data/differential_expression/gene_level/trinity_matrix.gene.counts.matrix.AZ2_vs_AZ3.edgeR.DE_results.MA_n_Volcano.pdf" class="btn-sm btn-secondary" target="_blank"><i class="fa-solid fa-file-pdf"></i> Volcano PDF</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 7: Normalized Expression Matrix -->
+                    <tr>
+                        <td><strong>7</strong></td>
+                        <td>
+                            <strong>TMM Normalized Expression Matrix</strong>
+                            <div class="item-desc">432 DE genes across all samples</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Trimmed Mean of M-values (TMM) normalized expression matrix for all 432 unique differentially expressed genes across AZ1, AZ2, and AZ3.</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/de_genes_expression_matrix.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> Matrix CSV</a>
+                                <a href="results/tables/tsv/de_genes_expression_matrix.tsv" class="btn-sm btn-secondary" download>Matrix TSV</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 8: PCA Variance -->
+                    <tr>
+                        <td><strong>8</strong></td>
+                        <td>
+                            <strong>Principal Component Analysis (PCA)</strong>
+                            <div class="item-desc">Sample distance and dimensional reduction</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Computed via <span class="code-tag">sklearn.decomposition.PCA</span> on log2(TMM + 1) transformed expression across all 3 conditions.</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/pca_coordinates.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> PCA Coords (.csv)</a>
+                                <a href="results/tables/tsv/pca_coordinates.tsv" class="btn-sm btn-secondary" download>TSV</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 9: DE Overlap Venn -->
+                    <tr>
+                        <td><strong>9</strong></td>
+                        <td>
+                            <strong>3-Way DE Intersection Breakdown</strong>
+                            <div class="item-desc">Shared vs condition-specific DE genes</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Set-theoretic 3-way partition of all 432 DE genes: AZ1 vs AZ2 only (145), AZ1 vs AZ3 only (57), AZ2 vs AZ3 only (95), and multi-shared groups.</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/de_overlap_counts.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> Overlap CSV</a>
+                                <a href="results/tables/tsv/de_overlap_counts.tsv" class="btn-sm btn-secondary" download>TSV</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 10: Candidate Genes Expression -->
+                    <tr>
+                        <td><strong>10</strong></td>
+                        <td>
+                            <strong>Top 6 Candidate Biomarkers</strong>
+                            <div class="item-desc">Lowest FDR candidate gene profiles</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Ranked lowest FDR genes: TRINITY_DN668781_c0_g1, TRINITY_DN698944_c1_g2, TRINITY_DN698789_c3_g7, TRINITY_DN688158_c1_g2, etc.</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/top_candidate_genes_expression.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> Candidate CSV</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 11: Gene Ontology (GO) -->
+                    <tr>
+                        <td><strong>11</strong></td>
+                        <td>
+                            <strong>Gene Ontology (GO) Annotation</strong>
+                            <div class="item-desc">Biological process, molecular function & cellular component</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Integrated Trinotate BLASTX/BLASTP mapping to GO terms (Nucleus, Mitochondrion, Endonuclease activity, Zinc ion binding, etc.).</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/top_go_categories.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> Top GO CSV</a>
+                                <a href="results/tables/tsv/top_go_categories.tsv" class="btn-sm btn-secondary" download>Top GO TSV</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 12: Pfam Domains -->
+                    <tr>
+                        <td><strong>12</strong></td>
+                        <td>
+                            <strong>Pfam Domain Annotation</strong>
+                            <div class="item-desc">HMMER3 protein family domain search</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>HMM profile matches across translated TransDecoder peptide sequences against Pfam-A database.</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/top_pfam_domains.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> Pfam CSV</a>
+                                <a href="results/tables/tsv/top_pfam_domains.tsv" class="btn-sm btn-secondary" download>Pfam TSV</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 13: Trinotate Master Report -->
+                    <tr>
+                        <td><strong>13</strong></td>
+                        <td>
+                            <strong>Master Functional Annotation Sheet</strong>
+                            <div class="item-desc">SwissProt, Pfam, GO, KEGG, Rfam non-coding RNAs</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Complete integrated Trinotate SQLite functional database exported as a comprehensive multi-feature annotation spreadsheet.</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="data/annotation/trinotate_DE_annotation_report.xls" class="btn-sm" download><i class="fa-solid fa-file-excel"></i> Master Report (.xls)</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Item 14: Isoform Switching Analysis -->
+                    <tr>
+                        <td><strong>14</strong></td>
+                        <td>
+                            <strong>Isoform Switching & Alternative Splicing</strong>
+                            <div class="item-desc">Dominant transcript condition switches</div>
+                        </td>
+                        <td><span class="badge-success">✔ Completed</span></td>
+                        <td>Identified 228 multi-isoform genes where the dominant highest-expressed transcript switches identity between AZ1, AZ2, and AZ3.</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="results/tables/csv/isoform_switching_candidates.csv" class="btn-sm" download><i class="fa-solid fa-file-csv"></i> Switch CSV (n=228)</a>
+                                <a href="results/tables/tsv/isoform_switching_candidates.tsv" class="btn-sm btn-secondary" download>Switch TSV</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- ================= ISOFORM SWITCHING EXPLORER ================= -->
+        <div class="section-header" id="isoform-section">
+            <div class="section-title-wrap">
+                <span class="tier-badge tier-2-badge">Isoform Explorer</span>
+                <h2 class="section-title">Candidate Alternative Splicing Switches</h2>
+            </div>
+            <p class="section-desc">Searchable table displaying condition-dependent shifts in the dominant transcript isoform.</p>
+        </div>
+
+        <div class="matrix-container" style="margin-bottom: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h3 style="font-size: 1.1rem; font-weight: 700;">Isoform Switching Genes (n=228)</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">Filtered list of multi-transcript genes with condition-specific dominant isoforms.</p>
+                </div>
+                <input type="text" id="geneSearch" class="btn-sm btn-secondary" style="padding: 0.6rem 1rem; width: 300px; font-family: inherit; font-size: 0.85rem;" placeholder="Search gene ID..." onkeyup="filterTable()">
+            </div>
+            <table class="matrix-table" id="isoformTable">
+                <thead>
+                    <tr>
+                        <th>Gene ID</th>
+                        <th>Dominant Isoform (AZ1)</th>
+                        <th>Dominant Isoform (AZ2)</th>
+                        <th>Dominant Isoform (AZ3)</th>
+                        <th>AZ1 TMM</th>
+                        <th>AZ2 TMM</th>
+                        <th>AZ3 TMM</th>
+                        <th>Switch Classification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="code-tag">TRINITY_DN696364_c0_g2</td>
+                        <td class="code-tag">..._i15</td>
+                        <td class="code-tag">..._i10</td>
+                        <td class="code-tag">..._i9</td>
+                        <td>3.27</td>
+                        <td>7.40</td>
+                        <td><strong>200.38</strong></td>
+                        <td><span class="badge-success">AZ3 Switch</span></td>
+                    </tr>
+                    <tr>
+                        <td class="code-tag">TRINITY_DN695985_c2_g1</td>
+                        <td class="code-tag">..._i20</td>
+                        <td class="code-tag">..._i20</td>
+                        <td class="code-tag">..._i6</td>
+                        <td>5.35</td>
+                        <td>11.70</td>
+                        <td><strong>62.14</strong></td>
+                        <td><span class="badge-success">AZ3 Switch</span></td>
+                    </tr>
+                    <tr>
+                        <td class="code-tag">TRINITY_DN698466_c1_g1</td>
+                        <td class="code-tag">..._i1</td>
+                        <td class="code-tag">..._i4</td>
+                        <td class="code-tag">..._i26</td>
+                        <td>11.03</td>
+                        <td><strong>53.07</strong></td>
+                        <td>35.64</td>
+                        <td><span class="badge-info">3-Way Switch</span></td>
+                    </tr>
+                    <tr>
+                        <td class="code-tag">TRINITY_DN695934_c2_g1</td>
+                        <td class="code-tag">..._i17</td>
+                        <td class="code-tag">..._i14</td>
+                        <td class="code-tag">..._i7</td>
+                        <td>2.66</td>
+                        <td><strong>23.40</strong></td>
+                        <td>4.70</td>
+                        <td><span class="badge-success">AZ2 Switch</span></td>
+                    </tr>
+                    <tr>
+                        <td class="code-tag">TRINITY_DN689760_c0_g1</td>
+                        <td class="code-tag">..._i19</td>
+                        <td class="code-tag">..._i10</td>
+                        <td class="code-tag">..._i10</td>
+                        <td>2.15</td>
+                        <td><strong>12.90</strong></td>
+                        <td>4.86</td>
+                        <td><span class="badge-info">AZ2/AZ3 Shift</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end;">
+                <a href="results/tables/csv/isoform_switching_candidates.csv" download class="btn-sm"><i class="fa-solid fa-download"></i> Download All 228 Isoform Switches (.csv)</a>
+            </div>
+        </div>
+
+
+        <!-- ================= VISUALIZATIONS SUITE (PLACED AT THE END) ================= -->
+        <div class="section-header" id="suite-visualizations">
+            <div class="section-title-wrap">
+                <span class="tier-badge tier-3-badge">Visual Suite</span>
+                <h2 class="section-title">Scientific Visualizations & Publication Figures</h2>
+            </div>
+            <p class="section-desc">Interactive high-resolution 300 DPI figures generated across Quality Control, Differential Expression, and Functional Annotations.</p>
         </div>
 
         <div class="cards-grid">
-            <!-- BUSCO Figure Card -->
+            <!-- Figure 1: BUSCO -->
             <div class="viz-card">
                 <div>
                     <div class="viz-header">
-                        <h3 class="viz-title">1. BUSCO Completeness Assessment</h3>
-                        <span class="status-pill pill-success">Benchmark Passed</span>
+                        <h3 class="viz-title">Figure 1. BUSCO Completeness Assessment</h3>
+                        <span class="badge-success">QC & Benchmarking</span>
                     </div>
                     <p class="viz-desc">
-                        Benchmarking Universal Single-Copy Orthologs assessment using the <code>eukaryota_odb12.2</code> lineage model (125 total ortholog groups searched).
+                        Horizontal stacked bar chart demonstrating assembly benchmarking: Complete Single-copy (41.6%), Complete Duplicated (26.4%), Fragmented (28.8%), and Missing (3.2%).
                     </p>
                     <div class="viz-badge-group">
                         <span class="tag-badge">Single: 41.6%</span>
                         <span class="tag-badge">Duplicated: 26.4%</span>
                         <span class="tag-badge">Fragmented: 28.8%</span>
-                        <span class="tag-badge">Missing: 3.2%</span>
                     </div>
-                    <div class="viz-img-wrap" onclick="openModal('results/figures/busco_completeness.png', 'BUSCO Completeness Assessment')">
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/busco_completeness.png', 'Figure 1. BUSCO Completeness Assessment')">
                         <img src="results/figures/busco_completeness.png" alt="BUSCO Completeness Assessment">
                     </div>
                 </div>
                 <div class="viz-actions">
-                    <a href="results/figures/busco_completeness.png" target="_blank" class="action-btn">
+                    <a href="results/figures/busco_completeness.png" target="_blank" class="btn-sm">
                         <i class="fa-solid fa-expand"></i> View High-Res
                     </a>
-                    <a href="results/tables/csv/busco_completeness_percentages.csv" download class="action-btn secondary">
+                    <a href="results/tables/csv/busco_completeness_percentages.csv" download class="btn-sm btn-secondary">
                         <i class="fa-solid fa-file-csv"></i> Download CSV
                     </a>
                 </div>
             </div>
 
-            <!-- Assembly Metrics Card -->
+            <!-- Figure 2: PCA Plot -->
             <div class="viz-card">
                 <div>
                     <div class="viz-header">
-                        <h3 class="viz-title">2. Assembly & Mapping Efficiency</h3>
-                        <span class="status-pill pill-info">Salmon Quantification</span>
+                        <h3 class="viz-title">Figure 2. Principal Component Analysis (PCA)</h3>
+                        <span class="badge-info">Sample Variance</span>
                     </div>
                     <p class="viz-desc">
-                        Quantification metrics across biological samples mapped via Salmon quasi-indexing back to the Trinity de novo transcriptome assembly.
-                    </p>
-                    <div class="table-responsive" style="margin-bottom: 1.25rem;">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Sample</th>
-                                    <th>Read Pairs</th>
-                                    <th>Mapped Reads</th>
-                                    <th>Mapping Rate</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="code-cell">AZ1</td>
-                                    <td>13.38 M</td>
-                                    <td>10.75 M</td>
-                                    <td><span class="status-pill pill-success">80.37%</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="code-cell">AZ2</td>
-                                    <td>13.56 M</td>
-                                    <td>10.78 M</td>
-                                    <td><span class="status-pill pill-success">79.47%</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="code-cell">AZ3</td>
-                                    <td>8.38 M</td>
-                                    <td>6.73 M</td>
-                                    <td><span class="status-pill pill-success">80.28%</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="viz-actions">
-                    <a href="data/qc/TrinityStats.txt" target="_blank" class="action-btn secondary">
-                        <i class="fa-solid fa-file-lines"></i> View TrinityStats.txt
-                    </a>
-                    <a href="data/qc/busco_results/short_summary.specific.eukaryota_odb12.2.busco_results.txt" target="_blank" class="action-btn secondary">
-                        <i class="fa-solid fa-chart-pie"></i> View BUSCO Summary
-                    </a>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- ================= Tier 2 ================= -->
-        <div class="section-header" id="tier-2">
-            <div class="section-title-wrap">
-                <span class="tier-badge tier-2-badge">Tier 2</span>
-                <h2 class="section-title">Differential Expression & Multidimensional Profiling</h2>
-            </div>
-            <p class="section-desc">Statistical modeling with edgeR (FDR &lt; 0.05, dispersion = 0.1), hierarchical clustering, PCA variance, and Venn overlap.</p>
-        </div>
-
-        <div class="cards-grid">
-            <!-- PCA Plot Card -->
-            <div class="viz-card">
-                <div>
-                    <div class="viz-header">
-                        <h3 class="viz-title">3. Principal Component Analysis (PCA)</h3>
-                        <span class="status-pill pill-info">Sample Variance</span>
-                    </div>
-                    <p class="viz-desc">
-                        Sample distance decomposition across PC1 and PC2 using log2(TMM + 1) normalized transcriptomic profiles for AZ1, AZ2, and AZ3.
+                        2D PCA scatter plot showing sample separation and variance explained across PC1 and PC2 using log2(TMM + 1) transformed expression values.
                     </p>
                     <div class="viz-badge-group">
-                        <span class="tag-badge">AZ1 (Control/T1)</span>
+                        <span class="tag-badge">AZ1 (Control)</span>
                         <span class="tag-badge">AZ2 (Condition 2)</span>
                         <span class="tag-badge">AZ3 (Condition 3)</span>
                     </div>
-                    <div class="viz-img-wrap" onclick="openModal('results/figures/pca_plot.png', 'Principal Component Analysis (PCA)')">
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/pca_plot.png', 'Figure 2. Principal Component Analysis (PCA)')">
                         <img src="results/figures/pca_plot.png" alt="PCA Plot">
                     </div>
                 </div>
                 <div class="viz-actions">
-                    <a href="results/figures/pca_plot.png" target="_blank" class="action-btn">
+                    <a href="results/figures/pca_plot.png" target="_blank" class="btn-sm">
                         <i class="fa-solid fa-expand"></i> View High-Res
                     </a>
-                    <a href="results/tables/csv/pca_coordinates.csv" download class="action-btn secondary">
-                        <i class="fa-solid fa-file-csv"></i> PCA Coords (.csv)
+                    <a href="results/tables/csv/pca_coordinates.csv" download class="btn-sm btn-secondary">
+                        <i class="fa-solid fa-file-csv"></i> Download CSV
                     </a>
                 </div>
             </div>
 
-            <!-- Heatmap Card -->
+            <!-- Figure 3: Heatmap -->
             <div class="viz-card">
                 <div>
                     <div class="viz-header">
-                        <h3 class="viz-title">4. Hierarchical Clustering Heatmap</h3>
-                        <span class="status-pill pill-info">432 DE Genes</span>
+                        <h3 class="viz-title">Figure 3. Hierarchical Clustering Heatmap</h3>
+                        <span class="badge-info">432 DE Genes</span>
                     </div>
                     <p class="viz-desc">
-                        Bidirectional Euclidean distance hierarchical clustering of 432 differentially expressed genes displaying condition-specific expression shifts.
+                        Hierarchical Euclidean clustering of log2(TMM + 1) normalized expression across all 432 differentially expressed genes displaying condition-specific expression shifts.
                     </p>
                     <div class="viz-badge-group">
                         <span class="tag-badge">Metric: Euclidean</span>
                         <span class="tag-badge">Method: Average</span>
-                        <span class="tag-badge">Z-score / log2(TMM+1)</span>
+                        <span class="tag-badge">432 DE Genes</span>
                     </div>
-                    <div class="viz-img-wrap" onclick="openModal('results/figures/de_heatmap.png', 'Hierarchical Clustering Heatmap')">
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/de_heatmap.png', 'Figure 3. Hierarchical Clustering Heatmap')">
                         <img src="results/figures/de_heatmap.png" alt="Hierarchical Clustering Heatmap">
                     </div>
                 </div>
                 <div class="viz-actions">
-                    <a href="results/figures/de_heatmap.png" target="_blank" class="action-btn">
+                    <a href="results/figures/de_heatmap.png" target="_blank" class="btn-sm">
                         <i class="fa-solid fa-expand"></i> View High-Res
                     </a>
-                    <a href="results/tables/csv/de_genes_expression_matrix.csv" download class="action-btn secondary">
-                        <i class="fa-solid fa-file-csv"></i> Expression Matrix (.csv)
+                    <a href="results/tables/csv/de_genes_expression_matrix.csv" download class="btn-sm btn-secondary">
+                        <i class="fa-solid fa-file-csv"></i> Download CSV
                     </a>
                 </div>
             </div>
 
-            <!-- Venn Diagram Card -->
+            <!-- Figure 4: Venn Diagram -->
             <div class="viz-card">
                 <div>
                     <div class="viz-header">
-                        <h3 class="viz-title">5. DE Gene Overlaps (Venn Diagram)</h3>
-                        <span class="status-pill pill-info">3-Way Comparison</span>
+                        <h3 class="viz-title">Figure 4. 3-Way DE Venn Diagram</h3>
+                        <span class="badge-info">Gene Overlap</span>
                     </div>
                     <p class="viz-desc">
-                        Three-way Venn intersection showing unique and shared differentially expressed genes between AZ1 vs AZ2, AZ1 vs AZ3, and AZ2 vs AZ3.
+                        Three-way Venn intersection showing unique and shared differentially expressed genes (FDR &lt; 0.05) across pairwise comparisons AZ1 vs AZ2, AZ1 vs AZ3, and AZ2 vs AZ3.
                     </p>
                     <div class="viz-badge-group">
-                        <span class="tag-badge">AZ1 vs AZ2: 993 genes</span>
-                        <span class="tag-badge">AZ1 vs AZ3: 1,103 genes</span>
-                        <span class="tag-badge">AZ2 vs AZ3: 839 genes</span>
+                        <span class="tag-badge">AZ1 vs AZ2: 993</span>
+                        <span class="tag-badge">AZ1 vs AZ3: 1,103</span>
+                        <span class="tag-badge">AZ2 vs AZ3: 839</span>
                     </div>
-                    <div class="viz-img-wrap" onclick="openModal('results/figures/de_overlap_venn.png', 'Differentially Expressed Genes Overlap')">
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/de_overlap_venn.png', 'Figure 4. Differentially Expressed Genes Overlap')">
                         <img src="results/figures/de_overlap_venn.png" alt="DE Overlap Venn Diagram">
                     </div>
                 </div>
                 <div class="viz-actions">
-                    <a href="results/figures/de_overlap_venn.png" target="_blank" class="action-btn">
+                    <a href="results/figures/de_overlap_venn.png" target="_blank" class="btn-sm">
                         <i class="fa-solid fa-expand"></i> View High-Res
                     </a>
-                    <a href="results/tables/csv/de_overlap_counts.csv" download class="action-btn secondary">
-                        <i class="fa-solid fa-file-csv"></i> Overlap Counts (.csv)
+                    <a href="results/tables/csv/de_overlap_counts.csv" download class="btn-sm btn-secondary">
+                        <i class="fa-solid fa-file-csv"></i> Download CSV
                     </a>
                 </div>
             </div>
 
-            <!-- Top Candidate Genes Card -->
+            <!-- Figure 5: Top Candidate Genes -->
             <div class="viz-card">
                 <div>
                     <div class="viz-header">
-                        <h3 class="viz-title">6. Top 6 Candidate DE Genes</h3>
-                        <span class="status-pill pill-warning">Lowest FDR</span>
+                        <h3 class="viz-title">Figure 5. Top 6 Candidate DE Genes</h3>
+                        <span class="badge-warning">Lowest FDR</span>
                     </div>
                     <p class="viz-desc">
-                        Per-sample TMM expression profiles of top candidate marker genes exhibiting highest statistical significance and fold changes.
+                        3x2 grid of per-sample TMM expression profiles for the top 6 candidate genes displaying the highest statistical significance and expression divergence.
                     </p>
                     <div class="viz-badge-group">
                         <span class="tag-badge">TRINITY_DN668781_c0_g1</span>
                         <span class="tag-badge">TRINITY_DN688158_c1_g2</span>
-                        <span class="tag-badge">TRINITY_DN698789_c3_g7</span>
                     </div>
-                    <div class="viz-img-wrap" onclick="openModal('results/figures/candidate_genes_expression.png', 'Expression Profiles of Top Candidate Genes')">
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/candidate_genes_expression.png', 'Figure 5. Expression Profiles of Top 6 Candidate Genes')">
                         <img src="results/figures/candidate_genes_expression.png" alt="Candidate Genes Expression">
                     </div>
                 </div>
                 <div class="viz-actions">
-                    <a href="results/figures/candidate_genes_expression.png" target="_blank" class="action-btn">
+                    <a href="results/figures/candidate_genes_expression.png" target="_blank" class="btn-sm">
                         <i class="fa-solid fa-expand"></i> View High-Res
                     </a>
-                    <a href="results/tables/csv/top_candidate_genes_expression.csv" download class="action-btn secondary">
-                        <i class="fa-solid fa-file-csv"></i> Candidate TMM (.csv)
+                    <a href="results/tables/csv/top_candidate_genes_expression.csv" download class="btn-sm btn-secondary">
+                        <i class="fa-solid fa-file-csv"></i> Download CSV
                     </a>
                 </div>
             </div>
-        </div>
 
-
-        <!-- ================= Tier 3 ================= -->
-        <div class="section-header" id="tier-3">
-            <div class="section-title-wrap">
-                <span class="tier-badge tier-3-badge">Tier 3</span>
-                <h2 class="section-title">Functional & Structural Annotations</h2>
-            </div>
-            <p class="section-desc">Trinotate functional profiling: Gene Ontology (GO) terms and Pfam domain architecture across DE transcripts.</p>
-        </div>
-
-        <div class="cards-grid">
-            <!-- GO Categories Card -->
+            <!-- Figure 6: Top GO Categories -->
             <div class="viz-card">
                 <div>
                     <div class="viz-header">
-                        <h3 class="viz-title">7. Top 15 Gene Ontology (GO) Terms</h3>
-                        <span class="status-pill pill-info">Trinotate Annotation</span>
+                        <h3 class="viz-title">Figure 6. Top 15 Gene Ontology (GO) Terms</h3>
+                        <span class="badge-info">Functional Annotation</span>
                     </div>
                     <p class="viz-desc">
-                        Most frequent functional classifications encompassing Cellular Component, Molecular Function, and Biological Processes.
+                        Horizontal bar plot of the top 15 most abundant Gene Ontology functional classifications assigned to differentially expressed transcripts.
                     </p>
                     <div class="viz-badge-group">
                         <span class="tag-badge">Nucleus (45)</span>
                         <span class="tag-badge">Mitochondrion (45)</span>
                         <span class="tag-badge">Endonuclease (31)</span>
-                        <span class="tag-badge">Zinc Binding (30)</span>
                     </div>
-                    <div class="viz-img-wrap" onclick="openModal('results/figures/top_go_categories.png', 'Top 15 Most Abundant GO Terms')">
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/top_go_categories.png', 'Figure 6. Top 15 Most Abundant GO Terms')">
                         <img src="results/figures/top_go_categories.png" alt="Top GO Categories">
                     </div>
                 </div>
                 <div class="viz-actions">
-                    <a href="results/figures/top_go_categories.png" target="_blank" class="action-btn">
+                    <a href="results/figures/top_go_categories.png" target="_blank" class="btn-sm">
                         <i class="fa-solid fa-expand"></i> View High-Res
                     </a>
-                    <a href="results/tables/csv/top_go_categories.csv" download class="action-btn secondary">
-                        <i class="fa-solid fa-file-csv"></i> GO Table (.csv)
+                    <a href="results/tables/csv/top_go_categories.csv" download class="btn-sm btn-secondary">
+                        <i class="fa-solid fa-file-csv"></i> Download CSV
                     </a>
                 </div>
             </div>
 
-            <!-- Pfam Domains Card -->
+            <!-- Figure 7: Top Pfam Domains -->
             <div class="viz-card">
                 <div>
                     <div class="viz-header">
-                        <h3 class="viz-title">8. Top Pfam Protein Domains</h3>
-                        <span class="status-pill pill-info">HMMER3 Search</span>
+                        <h3 class="viz-title">Figure 7. Top 15 Pfam Protein Domains</h3>
+                        <span class="badge-info">Structural Architecture</span>
                     </div>
                     <p class="viz-desc">
-                        Prevalent protein family signatures and functional catalytic/structural domains annotated against the Pfam-A database.
+                        Horizontal bar plot of the top 15 most prevalent Pfam protein domains and catalytic signatures identified in DE transcripts.
                     </p>
                     <div class="viz-badge-group">
-                        <span class="tag-badge">PF00076 (RNA Rec)</span>
-                        <span class="tag-badge">PF13893 (Retrotrans)</span>
-                        <span class="tag-badge">PF14392</span>
-                        <span class="tag-badge">PF00501 (AMP-binding)</span>
+                        <span class="tag-badge">PF00076 (RNA Recognition)</span>
+                        <span class="tag-badge">PF13893 (Retrotransposon)</span>
                     </div>
-                    <div class="viz-img-wrap" onclick="openModal('results/figures/top_pfam_domains.png', 'Top Pfam Domains in DE Transcripts')">
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/top_pfam_domains.png', 'Figure 7. Top 15 Most Abundant Pfam Domains')">
                         <img src="results/figures/top_pfam_domains.png" alt="Top Pfam Domains">
                     </div>
                 </div>
                 <div class="viz-actions">
-                    <a href="results/figures/top_pfam_domains.png" target="_blank" class="action-btn">
+                    <a href="results/figures/top_pfam_domains.png" target="_blank" class="btn-sm">
                         <i class="fa-solid fa-expand"></i> View High-Res
                     </a>
-                    <a href="results/tables/csv/top_pfam_domains.csv" download class="action-btn secondary">
-                        <i class="fa-solid fa-file-csv"></i> Pfam Table (.csv)
+                    <a href="results/tables/csv/top_pfam_domains.csv" download class="btn-sm btn-secondary">
+                        <i class="fa-solid fa-file-csv"></i> Download CSV
                     </a>
                 </div>
-            </div>
-        </div>
-
-
-        <!-- ================= Tier 4 ================= -->
-        <div class="section-header" id="tier-4">
-            <div class="section-title-wrap">
-                <span class="tier-badge tier-4-badge">Tier 4</span>
-                <h2 class="section-title">Isoform Switching & Deliverables Directory</h2>
-            </div>
-            <p class="section-desc">Interactive tabular exploration of candidate alternative splicing switches and direct deliverable downloads.</p>
-        </div>
-
-        <!-- Interactive Isoform Switching Table -->
-        <div class="table-card">
-            <div class="table-controls">
-                <div>
-                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;">Candidate Isoform Switching Genes (n=228)</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-secondary);">Genes exhibiting condition-dependent shifts in the highest-expressed dominant isoform.</p>
-                </div>
-                <input type="text" id="geneSearch" class="search-input" placeholder="Search gene or transcript ID..." onkeyup="filterTable()">
-            </div>
-            <div class="table-responsive">
-                <table id="isoformTable">
-                    <thead>
-                        <tr>
-                            <th>Gene ID</th>
-                            <th>Dominant Isoform (AZ1)</th>
-                            <th>Dominant Isoform (AZ2)</th>
-                            <th>Dominant Isoform (AZ3)</th>
-                            <th>AZ1 TMM</th>
-                            <th>AZ2 TMM</th>
-                            <th>AZ3 TMM</th>
-                            <th>Switch Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="code-cell">TRINITY_DN696364_c0_g2</td>
-                            <td class="code-cell">..._i15</td>
-                            <td class="code-cell">..._i10</td>
-                            <td class="code-cell">..._i9</td>
-                            <td>3.27</td>
-                            <td>7.40</td>
-                            <td><strong>200.38</strong></td>
-                            <td><span class="status-pill pill-warning">AZ3 Switch</span></td>
-                        </tr>
-                        <tr>
-                            <td class="code-cell">TRINITY_DN695985_c2_g1</td>
-                            <td class="code-cell">..._i20</td>
-                            <td class="code-cell">..._i20</td>
-                            <td class="code-cell">..._i6</td>
-                            <td>5.35</td>
-                            <td>11.70</td>
-                            <td><strong>62.14</strong></td>
-                            <td><span class="status-pill pill-warning">AZ3 Switch</span></td>
-                        </tr>
-                        <tr>
-                            <td class="code-cell">TRINITY_DN698466_c1_g1</td>
-                            <td class="code-cell">..._i1</td>
-                            <td class="code-cell">..._i4</td>
-                            <td class="code-cell">..._i26</td>
-                            <td>11.03</td>
-                            <td><strong>53.07</strong></td>
-                            <td>35.64</td>
-                            <td><span class="status-pill pill-warning">3-Way Switch</span></td>
-                        </tr>
-                        <tr>
-                            <td class="code-cell">TRINITY_DN695934_c2_g1</td>
-                            <td class="code-cell">..._i17</td>
-                            <td class="code-cell">..._i14</td>
-                            <td class="code-cell">..._i7</td>
-                            <td>2.66</td>
-                            <td><strong>23.40</strong></td>
-                            <td>4.70</td>
-                            <td><span class="status-pill pill-warning">AZ2 Switch</span></td>
-                        </tr>
-                        <tr>
-                            <td class="code-cell">TRINITY_DN689760_c0_g1</td>
-                            <td class="code-cell">..._i19</td>
-                            <td class="code-cell">..._i10</td>
-                            <td class="code-cell">..._i10</td>
-                            <td>2.15</td>
-                            <td><strong>12.90</strong></td>
-                            <td>4.86</td>
-                            <td><span class="status-pill pill-warning">AZ2/AZ3 Shift</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
-                <a href="results/tables/csv/isoform_switching_candidates.csv" download class="action-btn">
-                    <i class="fa-solid fa-download"></i> Download Full Isoform Switching Table (228 Candidates)
-                </a>
-            </div>
-        </div>
-
-        <!-- Master Deliverables Table -->
-        <div class="table-card" id="deliverables">
-            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">Master Deliverables Directory</h3>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">Direct access to all generated differential expression matrices, statistics, and functional tables.</p>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Deliverable Description</th>
-                            <th>Analysis Module</th>
-                            <th>Format</th>
-                            <th>Direct Downloads</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>AZ1 vs AZ2 Differential Expression</strong></td>
-                            <td>edgeR Gene & Isoform DE</td>
-                            <td>CSV / TSV</td>
-                            <td>
-                                <a href="results/tables/csv/AZ1_vs_AZ2_gene_DE_results.csv" download class="action-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Gene CSV</a>
-                                <a href="results/tables/csv/AZ1_vs_AZ2_isoform_DE_results.csv" download class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Isoform CSV</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>AZ1 vs AZ3 Differential Expression</strong></td>
-                            <td>edgeR Gene & Isoform DE</td>
-                            <td>CSV / TSV</td>
-                            <td>
-                                <a href="results/tables/csv/AZ1_vs_AZ3_gene_DE_results.csv" download class="action-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Gene CSV</a>
-                                <a href="results/tables/csv/AZ1_vs_AZ3_isoform_DE_results.csv" download class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Isoform CSV</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>AZ2 vs AZ3 Differential Expression</strong></td>
-                            <td>edgeR Gene & Isoform DE</td>
-                            <td>CSV / TSV</td>
-                            <td>
-                                <a href="results/tables/csv/AZ2_vs_AZ3_gene_DE_results.csv" download class="action-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Gene CSV</a>
-                                <a href="results/tables/csv/AZ2_vs_AZ3_isoform_DE_results.csv" download class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Isoform CSV</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>DE Genes TMM Expression Matrix</strong></td>
-                            <td>Normalized Matrix</td>
-                            <td>CSV / TSV</td>
-                            <td>
-                                <a href="results/tables/csv/de_genes_expression_matrix.csv" download class="action-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Matrix CSV</a>
-                                <a href="results/tables/tsv/de_genes_expression_matrix.tsv" download class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Matrix TSV</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Trinotate Functional Annotation Report</strong></td>
-                            <td>SwissProt, Pfam, GO, Rfam</td>
-                            <td>Excel / TSV</td>
-                            <td>
-                                <a href="data/annotation/trinotate_DE_annotation_report.xls" download class="action-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Master Report (.xls)</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Pairwise Volcano & MA Plots</strong></td>
-                            <td>edgeR Graphical Plots</td>
-                            <td>Vector PDF</td>
-                            <td>
-                                <a href="data/differential_expression/gene_level/trinity_matrix.gene.counts.matrix.AZ1_vs_AZ2.edgeR.DE_results.MA_n_Volcano.pdf" target="_blank" class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">AZ1 vs AZ2 PDF</a>
-                                <a href="data/differential_expression/gene_level/trinity_matrix.gene.counts.matrix.AZ1_vs_AZ3.edgeR.DE_results.MA_n_Volcano.pdf" target="_blank" class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">AZ1 vs AZ3 PDF</a>
-                                <a href="data/differential_expression/gene_level/trinity_matrix.gene.counts.matrix.AZ2_vs_AZ3.edgeR.DE_results.MA_n_Volcano.pdf" target="_blank" class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">AZ2 vs AZ3 PDF</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
 
     </div>
 
-    <!-- Image Lightbox Modal -->
+    <!-- Fullscreen Modal -->
     <div id="imageModal" class="modal" onclick="closeModal()">
         <span class="modal-close">&times;</span>
         <img class="modal-content" id="modalImg" alt="Enlarged Plot">
