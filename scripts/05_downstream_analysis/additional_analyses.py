@@ -6,18 +6,32 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.decomposition import PCA
 
-# Set directories
-base_dir = '/home/angsuman/rna_pipeline/trinity_output'
-de_dir = os.path.join(base_dir, 'edgeR_gene_dir')
-report_file = os.path.join(base_dir, 'trinotate_DE_annotation_report.xls')
-gene_tmm_file = '/home/angsuman/rna_pipeline/trinity_output/trinity_matrix.gene.TMM.EXPR.matrix'
-iso_tmm_file = '/home/angsuman/rna_pipeline/trinity_output/trinity_matrix.isoform.TMM.EXPR.matrix'
-gene_trans_map_file = '/home/angsuman/rna_pipeline/trinity_output/Trinity_DE_subset.fasta.gene_trans_map'
+from pathlib import Path
 
-fig_dir = os.path.join(base_dir, 'figures')
-tables_dir = os.path.join(base_dir, 'tables')
+# Resolve repository root directory
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+de_dir = REPO_ROOT / 'data' / 'differential_expression' / 'gene_level'
+report_file = REPO_ROOT / 'data' / 'annotation' / 'trinotate_DE_annotation_report.xls'
+
+# Expression matrices: prefer external full matrices if present, else repo tables
+gene_tmm_file = Path('/home/angsuman/rna_pipeline/trinity_output/trinity_matrix.gene.TMM.EXPR.matrix')
+if not gene_tmm_file.exists():
+    gene_tmm_file = REPO_ROOT / 'results' / 'tables' / 'tsv' / 'de_genes_expression_matrix.tsv'
+
+iso_tmm_file = Path('/home/angsuman/rna_pipeline/trinity_output/trinity_matrix.isoform.TMM.EXPR.matrix')
+gene_trans_map_file = Path('/home/angsuman/rna_pipeline/trinity_output/Trinity_DE_subset.fasta.gene_trans_map')
+
+fig_dir = REPO_ROOT / 'results' / 'figures'
+tables_dir = REPO_ROOT / 'results' / 'tables' / 'tsv'
+csv_dir = REPO_ROOT / 'results' / 'tables' / 'csv'
 os.makedirs(fig_dir, exist_ok=True)
 os.makedirs(tables_dir, exist_ok=True)
+os.makedirs(csv_dir, exist_ok=True)
+
+def save_table(df, name, index=False):
+    df.to_csv(tables_dir / f"{name}.tsv", sep='\t', index=index)
+    df.to_csv(csv_dir / f"{name}.csv", sep=',', index=index)
 
 # 1. PCA Scatter Plot
 print("1. Running Principal Component Analysis (PCA)...")
@@ -49,7 +63,7 @@ if os.path.exists(gene_tmm_file):
     plt.close()
     
     # Save PCA coordinates table
-    pca_df.to_csv(os.path.join(tables_dir, 'pca_coordinates.tsv'), sep='\t')
+    save_table(pca_df, 'pca_coordinates', index=True)
 
 # 2. KEGG Pathway Analysis
 print("2. Parsing KEGG Pathways...")
@@ -103,7 +117,7 @@ if os.path.exists(report_file):
         
         # Save table
         kegg_table = pd.DataFrame({'Pathway_Code': kegg_counts.index, 'Description': labels, 'Counts': kegg_counts.values})
-        kegg_table.to_csv(os.path.join(tables_dir, 'kegg_pathways_abundance.tsv'), sep='\t', index=False)
+        save_table(kegg_table, 'kegg_pathways_abundance', index=False)
 
 # 3. TF Family Classification
 print("3. Classifying Transcription Factors (TFs)...")
@@ -155,8 +169,8 @@ if os.path.exists(report_file):
         plt.close()
         
         # Save tables
-        tf_df.to_csv(os.path.join(tables_dir, 'detected_tfs_list.tsv'), sep='\t', index=False)
-        tf_counts.to_frame('Counts').to_csv(os.path.join(tables_dir, 'tf_families_summary.tsv'), sep='\t')
+        save_table(tf_df, 'detected_tfs_list', index=False)
+        save_table(tf_counts.to_frame('Counts'), 'tf_families_summary', index=True)
 
 # 4. Expression Profiles of Top 6 DE Candidate Genes
 print("4. Plotting top candidate genes...")
@@ -241,7 +255,7 @@ if os.path.exists(iso_tmm_file) and os.path.exists(gene_trans_map_file):
             
     if switches:
         switch_df = pd.DataFrame(switches)
-        switch_df.to_csv(os.path.join(tables_dir, 'isoform_switching_candidates.tsv'), sep='\t', index=False)
+        save_table(switch_df, 'isoform_switching_candidates', index=False)
         print(f"Found {len(switch_df)} genes showing dominant isoform switches between samples.")
 
 print("Additional analyses and tables created successfully!")

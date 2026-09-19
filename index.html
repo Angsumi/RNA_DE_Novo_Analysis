@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>De Novo RNA-Seq Transcriptome Assembly & Differential Expression Analysis | Results & Visualizations</title>
+    <meta name="description" content="Comprehensive interactive report, publication figures, quality control metrics, and differential expression suite across conditions AZ1, AZ2, and AZ3.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Base Obsidian Palette */
+            --bg-base: #090d16;
+            --bg-card: rgba(18, 24, 39, 0.75);
+            --bg-card-hover: rgba(24, 33, 53, 0.90);
+            --bg-header: rgba(13, 18, 30, 0.88);
+            
+            /* Typography */
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            /* Accents & Gradients */
+            --accent-indigo: #6366f1;
+            --accent-cyan: #06b6d4;
+            --accent-pink: #ec4899;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-glow: rgba(99, 102, 241, 0.35);
+            --accent-cyan-glow: rgba(6, 182, 212, 0.3);
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+            --accent-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #0891b2 100%);
+            
+            /* Borders & Insets */
+            --border-hairline: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(99, 102, 241, 0.35);
+            --inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
+            --card-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.55);
+            
+            /* Status Colors */
+            --status-success-bg: rgba(16, 185, 129, 0.12);
+            --status-success-text: #34d399;
+            --status-success-border: rgba(52, 211, 153, 0.28);
+            
+            --status-warning-bg: rgba(245, 158, 11, 0.12);
+            --status-warning-text: #fbbf24;
+            --status-warning-border: rgba(251, 191, 36, 0.28);
+            
+            --status-info-bg: rgba(6, 182, 212, 0.12);
+            --status-info-text: #38bdf8;
+            --status-info-border: rgba(56, 189, 248, 0.28);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(at 15% 10%, rgba(99, 102, 241, 0.18) 0px, transparent 55%),
+                radial-gradient(at 85% 20%, rgba(6, 182, 212, 0.14) 0px, transparent 50%),
+                radial-gradient(at 50% 80%, rgba(236, 72, 153, 0.08) 0px, transparent 60%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            line-height: 1.65;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-header);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-hairline);
+            padding: 0.9rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .nav-brand i {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.4rem;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .nav-links a:hover {
+            color: var(--accent-cyan);
+        }
+        .github-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-hairline);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .github-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-indigo);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 5rem 1.5rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem 3.5rem 1rem;
+            position: relative;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1.1rem;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #818cf8;
+            margin-bottom: 1.25rem;
+        }
+        .hero h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 860px;
+            margin: 0 auto 2.5rem auto;
+            line-height: 1.7;
+        }
+
+        /* Quick Metric Ribbon */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 3.5rem;
+        }
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hairline);
+            border-radius: 14px;
+            padding: 1.4rem 1.2rem;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(12px);
+            transition: transform 0.25s ease, border-color 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent-gradient);
+            opacity: 0.8;
+        }
+        .metric-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-highlight);
+        }
+        .metric-label {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .metric-value {
+            font-size: 1.85rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .metric-sub {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 0.35rem;
+        }
+
+        /* Quick Navigation Bar */
+        .quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 3.5rem;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-hairline);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            justify-content: center;
+        }
+        .quick-nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1.1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-hairline);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .quick-nav a:hover, .quick-nav a.active {
+            background: var(--accent-gradient);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+
+        /* Tier / Section Header */
+        .section-header {
+            margin: 4rem 0 1.8rem 0;
+            padding-bottom: 0.9rem;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .section-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .tier-badge {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-weight: 800;
+        }
+        .tier-1-badge { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.35); }
+        .tier-2-badge { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.35); }
+        .tier-3-badge { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.35); }
+        .tier-4-badge { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+        .section-desc {
+            width: 100%;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: -0.3rem;
+        }
+
+        /* Visual Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .viz-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hairline);
+            border-radius: 18px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(14px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .viz-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-highlight);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(99, 102, 241, 0.15);
+        }
+        .viz-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            gap: 0.75rem;
+        }
+        .viz-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.35;
+        }
+        .viz-desc {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+            line-height: 1.55;
+        }
+        .viz-img-wrap {
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-hairline);
+            border-radius: 12px;
+            padding: 0.75rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            min-height: 240px;
+            cursor: pointer;
+        }
+        .viz-img-wrap img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+        .viz-img-wrap:hover img {
+            transform: scale(1.02);
+        }
+        .viz-badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .tag-badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-hairline);
+            color: var(--text-secondary);
+        }
+        .viz-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-hairline);
+            gap: 0.75rem;
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.45rem 0.9rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-hairline);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            background: var(--accent-gradient);
+            border-color: transparent;
+            color: #fff;
+        }
+        .action-btn.secondary {
+            color: var(--text-secondary);
+        }
+        .action-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* Interactive Data Table Component */
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hairline);
+            border-radius: 18px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(14px);
+            margin-bottom: 2.5rem;
+            overflow: hidden;
+        }
+        .table-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .search-input {
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-hairline);
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            width: 320px;
+            max-width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--accent-indigo);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border-hairline);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+        thead {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        th {
+            padding: 0.9rem 1.1rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            border-bottom: 1px solid var(--border-hairline);
+            white-space: nowrap;
+        }
+        td {
+            padding: 0.85rem 1.1rem;
+            border-bottom: 1px solid var(--border-hairline);
+            color: var(--text-primary);
+        }
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.025);
+        }
+        .code-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #38bdf8;
+        }
+        .status-pill {
+            display: inline-block;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+        .pill-success { background: var(--status-success-bg); color: var(--status-success-text); border: 1px solid var(--status-success-border); }
+        .pill-warning { background: var(--status-warning-bg); color: var(--status-warning-text); border: 1px solid var(--status-warning-border); }
+        .pill-info { background: var(--status-info-bg); color: var(--status-info-text); border: 1px solid var(--status-info-border); }
+
+        /* Fullscreen Image Lightbox Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(9, 13, 22, 0.92);
+            backdrop-filter: blur(12px);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            max-width: 90vw;
+            max-height: 85vh;
+            border-radius: 14px;
+            border: 1px solid var(--border-highlight);
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            background: #090d16;
+            padding: 0.5rem;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            color: #ffffff;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 5rem;
+            padding: 3rem 1.5rem;
+            border-top: 1px solid var(--border-hairline);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            background: rgba(9, 13, 22, 0.6);
+        }
+        footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <a href="#" class="nav-brand">
+            <i class="fa-solid fa-dna"></i>
+            <span>RNA De Novo Studio</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#tier-1">QC & Assembly</a></li>
+            <li><a href="#tier-2">Expression & DE</a></li>
+            <li><a href="#tier-3">Annotation & Mining</a></li>
+            <li><a href="#deliverables">Data Tables</a></li>
+        </ul>
+        <a href="https://github.com/Angsumi/RNA_DE_Novo_Analysis" target="_blank" class="github-btn">
+            <i class="fa-brands fa-github"></i>
+            <span>View GitHub Repo</span>
+        </a>
+    </nav>
+
+    <div class="container" id="overview">
+        <!-- Hero Header -->
+        <header class="hero">
+            <div class="hero-badge">
+                <i class="fa-solid fa-microscope"></i>
+                Transcriptomics & Differential Expression Portal
+            </div>
+            <h1>De Novo Transcriptome Assembly & DE Suite</h1>
+            <p class="hero-subtitle">
+                Complete expression profiling, comparative differential expression, orthology completeness benchmarking, and functional annotations across conditions <strong>AZ1</strong>, <strong>AZ2</strong>, and <strong>AZ3</strong>.
+            </p>
+        </header>
+
+        <!-- Metrics Ribbon -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">
+                    <span>Total Trinity Genes</span>
+                    <i class="fa-solid fa-network-wired" style="color: var(--accent-indigo);"></i>
+                </div>
+                <div class="metric-value">2.68 M</div>
+                <div class="metric-sub">2,682,805 de novo genes</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">
+                    <span>Total Transcripts</span>
+                    <i class="fa-solid fa-align-left" style="color: var(--accent-cyan);"></i>
+                </div>
+                <div class="metric-value">2.94 M</div>
+                <div class="metric-sub">2,944,151 transcript contigs</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">
+                    <span>Contig N50 / Total Bases</span>
+                    <i class="fa-solid fa-chart-simple" style="color: var(--accent-pink);"></i>
+                </div>
+                <div class="metric-value">363 bp</div>
+                <div class="metric-sub">1.07 Gbp assembled bases</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">
+                    <span>BUSCO Completeness</span>
+                    <i class="fa-solid fa-check-double" style="color: var(--accent-emerald);"></i>
+                </div>
+                <div class="metric-value">68.0%</div>
+                <div class="metric-sub">85/125 Complete (eukaryota)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">
+                    <span>Differentially Expressed</span>
+                    <i class="fa-solid fa-arrow-trend-up" style="color: var(--accent-amber);"></i>
+                </div>
+                <div class="metric-value">432</div>
+                <div class="metric-sub">Unique DE genes (FDR &lt; 0.05)</div>
+            </div>
+        </section>
+
+        <!-- Navigation Jump Links -->
+        <nav class="quick-nav">
+            <a href="#tier-1"><i class="fa-solid fa-vial"></i> Tier 1: Assembly QC & Completeness</a>
+            <a href="#tier-2"><i class="fa-solid fa-chart-line"></i> Tier 2: Differential Expression & Clustering</a>
+            <a href="#tier-3"><i class="fa-solid fa-shapes"></i> Tier 3: Functional Annotation & Pathways</a>
+            <a href="#tier-4"><i class="fa-solid fa-table"></i> Tier 4: Master Expression & Isoform Switching</a>
+        </nav>
+
+        <!-- ================= Tier 1 ================= -->
+        <div class="section-header" id="tier-1">
+            <div class="section-title-wrap">
+                <span class="tier-badge tier-1-badge">Tier 1</span>
+                <h2 class="section-title">Assembly Quality Control & Benchmarking</h2>
+            </div>
+            <p class="section-desc">Assessment of transcript contiguity, evolutionary completeness benchmarking (BUSCO), and alignment rates.</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- BUSCO Figure Card -->
+            <div class="viz-card">
+                <div>
+                    <div class="viz-header">
+                        <h3 class="viz-title">1. BUSCO Completeness Assessment</h3>
+                        <span class="status-pill pill-success">Benchmark Passed</span>
+                    </div>
+                    <p class="viz-desc">
+                        Benchmarking Universal Single-Copy Orthologs assessment using the <code>eukaryota_odb12.2</code> lineage model (125 total ortholog groups searched).
+                    </p>
+                    <div class="viz-badge-group">
+                        <span class="tag-badge">Single: 41.6%</span>
+                        <span class="tag-badge">Duplicated: 26.4%</span>
+                        <span class="tag-badge">Fragmented: 28.8%</span>
+                        <span class="tag-badge">Missing: 3.2%</span>
+                    </div>
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/busco_completeness.png', 'BUSCO Completeness Assessment')">
+                        <img src="results/figures/busco_completeness.png" alt="BUSCO Completeness Assessment">
+                    </div>
+                </div>
+                <div class="viz-actions">
+                    <a href="results/figures/busco_completeness.png" target="_blank" class="action-btn">
+                        <i class="fa-solid fa-expand"></i> View High-Res
+                    </a>
+                    <a href="results/tables/csv/busco_completeness_percentages.csv" download class="action-btn secondary">
+                        <i class="fa-solid fa-file-csv"></i> Download CSV
+                    </a>
+                </div>
+            </div>
+
+            <!-- Assembly Metrics Card -->
+            <div class="viz-card">
+                <div>
+                    <div class="viz-header">
+                        <h3 class="viz-title">2. Assembly & Mapping Efficiency</h3>
+                        <span class="status-pill pill-info">Salmon Quantification</span>
+                    </div>
+                    <p class="viz-desc">
+                        Quantification metrics across biological samples mapped via Salmon quasi-indexing back to the Trinity de novo transcriptome assembly.
+                    </p>
+                    <div class="table-responsive" style="margin-bottom: 1.25rem;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sample</th>
+                                    <th>Read Pairs</th>
+                                    <th>Mapped Reads</th>
+                                    <th>Mapping Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="code-cell">AZ1</td>
+                                    <td>13.38 M</td>
+                                    <td>10.75 M</td>
+                                    <td><span class="status-pill pill-success">80.37%</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="code-cell">AZ2</td>
+                                    <td>13.56 M</td>
+                                    <td>10.78 M</td>
+                                    <td><span class="status-pill pill-success">79.47%</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="code-cell">AZ3</td>
+                                    <td>8.38 M</td>
+                                    <td>6.73 M</td>
+                                    <td><span class="status-pill pill-success">80.28%</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="viz-actions">
+                    <a href="data/qc/TrinityStats.txt" target="_blank" class="action-btn secondary">
+                        <i class="fa-solid fa-file-lines"></i> View TrinityStats.txt
+                    </a>
+                    <a href="data/qc/busco_results/short_summary.specific.eukaryota_odb12.2.busco_results.txt" target="_blank" class="action-btn secondary">
+                        <i class="fa-solid fa-chart-pie"></i> View BUSCO Summary
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ================= Tier 2 ================= -->
+        <div class="section-header" id="tier-2">
+            <div class="section-title-wrap">
+                <span class="tier-badge tier-2-badge">Tier 2</span>
+                <h2 class="section-title">Differential Expression & Multidimensional Profiling</h2>
+            </div>
+            <p class="section-desc">Statistical modeling with edgeR (FDR &lt; 0.05, dispersion = 0.1), hierarchical clustering, PCA variance, and Venn overlap.</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- PCA Plot Card -->
+            <div class="viz-card">
+                <div>
+                    <div class="viz-header">
+                        <h3 class="viz-title">3. Principal Component Analysis (PCA)</h3>
+                        <span class="status-pill pill-info">Sample Variance</span>
+                    </div>
+                    <p class="viz-desc">
+                        Sample distance decomposition across PC1 and PC2 using log2(TMM + 1) normalized transcriptomic profiles for AZ1, AZ2, and AZ3.
+                    </p>
+                    <div class="viz-badge-group">
+                        <span class="tag-badge">AZ1 (Control/T1)</span>
+                        <span class="tag-badge">AZ2 (Condition 2)</span>
+                        <span class="tag-badge">AZ3 (Condition 3)</span>
+                    </div>
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/pca_plot.png', 'Principal Component Analysis (PCA)')">
+                        <img src="results/figures/pca_plot.png" alt="PCA Plot">
+                    </div>
+                </div>
+                <div class="viz-actions">
+                    <a href="results/figures/pca_plot.png" target="_blank" class="action-btn">
+                        <i class="fa-solid fa-expand"></i> View High-Res
+                    </a>
+                    <a href="results/tables/csv/pca_coordinates.csv" download class="action-btn secondary">
+                        <i class="fa-solid fa-file-csv"></i> PCA Coords (.csv)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Heatmap Card -->
+            <div class="viz-card">
+                <div>
+                    <div class="viz-header">
+                        <h3 class="viz-title">4. Hierarchical Clustering Heatmap</h3>
+                        <span class="status-pill pill-info">432 DE Genes</span>
+                    </div>
+                    <p class="viz-desc">
+                        Bidirectional Euclidean distance hierarchical clustering of 432 differentially expressed genes displaying condition-specific expression shifts.
+                    </p>
+                    <div class="viz-badge-group">
+                        <span class="tag-badge">Metric: Euclidean</span>
+                        <span class="tag-badge">Method: Average</span>
+                        <span class="tag-badge">Z-score / log2(TMM+1)</span>
+                    </div>
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/de_heatmap.png', 'Hierarchical Clustering Heatmap')">
+                        <img src="results/figures/de_heatmap.png" alt="Hierarchical Clustering Heatmap">
+                    </div>
+                </div>
+                <div class="viz-actions">
+                    <a href="results/figures/de_heatmap.png" target="_blank" class="action-btn">
+                        <i class="fa-solid fa-expand"></i> View High-Res
+                    </a>
+                    <a href="results/tables/csv/de_genes_expression_matrix.csv" download class="action-btn secondary">
+                        <i class="fa-solid fa-file-csv"></i> Expression Matrix (.csv)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Venn Diagram Card -->
+            <div class="viz-card">
+                <div>
+                    <div class="viz-header">
+                        <h3 class="viz-title">5. DE Gene Overlaps (Venn Diagram)</h3>
+                        <span class="status-pill pill-info">3-Way Comparison</span>
+                    </div>
+                    <p class="viz-desc">
+                        Three-way Venn intersection showing unique and shared differentially expressed genes between AZ1 vs AZ2, AZ1 vs AZ3, and AZ2 vs AZ3.
+                    </p>
+                    <div class="viz-badge-group">
+                        <span class="tag-badge">AZ1 vs AZ2: 993 genes</span>
+                        <span class="tag-badge">AZ1 vs AZ3: 1,103 genes</span>
+                        <span class="tag-badge">AZ2 vs AZ3: 839 genes</span>
+                    </div>
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/de_overlap_venn.png', 'Differentially Expressed Genes Overlap')">
+                        <img src="results/figures/de_overlap_venn.png" alt="DE Overlap Venn Diagram">
+                    </div>
+                </div>
+                <div class="viz-actions">
+                    <a href="results/figures/de_overlap_venn.png" target="_blank" class="action-btn">
+                        <i class="fa-solid fa-expand"></i> View High-Res
+                    </a>
+                    <a href="results/tables/csv/de_overlap_counts.csv" download class="action-btn secondary">
+                        <i class="fa-solid fa-file-csv"></i> Overlap Counts (.csv)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Top Candidate Genes Card -->
+            <div class="viz-card">
+                <div>
+                    <div class="viz-header">
+                        <h3 class="viz-title">6. Top 6 Candidate DE Genes</h3>
+                        <span class="status-pill pill-warning">Lowest FDR</span>
+                    </div>
+                    <p class="viz-desc">
+                        Per-sample TMM expression profiles of top candidate marker genes exhibiting highest statistical significance and fold changes.
+                    </p>
+                    <div class="viz-badge-group">
+                        <span class="tag-badge">TRINITY_DN668781_c0_g1</span>
+                        <span class="tag-badge">TRINITY_DN688158_c1_g2</span>
+                        <span class="tag-badge">TRINITY_DN698789_c3_g7</span>
+                    </div>
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/candidate_genes_expression.png', 'Expression Profiles of Top Candidate Genes')">
+                        <img src="results/figures/candidate_genes_expression.png" alt="Candidate Genes Expression">
+                    </div>
+                </div>
+                <div class="viz-actions">
+                    <a href="results/figures/candidate_genes_expression.png" target="_blank" class="action-btn">
+                        <i class="fa-solid fa-expand"></i> View High-Res
+                    </a>
+                    <a href="results/tables/csv/top_candidate_genes_expression.csv" download class="action-btn secondary">
+                        <i class="fa-solid fa-file-csv"></i> Candidate TMM (.csv)
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ================= Tier 3 ================= -->
+        <div class="section-header" id="tier-3">
+            <div class="section-title-wrap">
+                <span class="tier-badge tier-3-badge">Tier 3</span>
+                <h2 class="section-title">Functional & Structural Annotations</h2>
+            </div>
+            <p class="section-desc">Trinotate functional profiling: Gene Ontology (GO) terms and Pfam domain architecture across DE transcripts.</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- GO Categories Card -->
+            <div class="viz-card">
+                <div>
+                    <div class="viz-header">
+                        <h3 class="viz-title">7. Top 15 Gene Ontology (GO) Terms</h3>
+                        <span class="status-pill pill-info">Trinotate Annotation</span>
+                    </div>
+                    <p class="viz-desc">
+                        Most frequent functional classifications encompassing Cellular Component, Molecular Function, and Biological Processes.
+                    </p>
+                    <div class="viz-badge-group">
+                        <span class="tag-badge">Nucleus (45)</span>
+                        <span class="tag-badge">Mitochondrion (45)</span>
+                        <span class="tag-badge">Endonuclease (31)</span>
+                        <span class="tag-badge">Zinc Binding (30)</span>
+                    </div>
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/top_go_categories.png', 'Top 15 Most Abundant GO Terms')">
+                        <img src="results/figures/top_go_categories.png" alt="Top GO Categories">
+                    </div>
+                </div>
+                <div class="viz-actions">
+                    <a href="results/figures/top_go_categories.png" target="_blank" class="action-btn">
+                        <i class="fa-solid fa-expand"></i> View High-Res
+                    </a>
+                    <a href="results/tables/csv/top_go_categories.csv" download class="action-btn secondary">
+                        <i class="fa-solid fa-file-csv"></i> GO Table (.csv)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Pfam Domains Card -->
+            <div class="viz-card">
+                <div>
+                    <div class="viz-header">
+                        <h3 class="viz-title">8. Top Pfam Protein Domains</h3>
+                        <span class="status-pill pill-info">HMMER3 Search</span>
+                    </div>
+                    <p class="viz-desc">
+                        Prevalent protein family signatures and functional catalytic/structural domains annotated against the Pfam-A database.
+                    </p>
+                    <div class="viz-badge-group">
+                        <span class="tag-badge">PF00076 (RNA Rec)</span>
+                        <span class="tag-badge">PF13893 (Retrotrans)</span>
+                        <span class="tag-badge">PF14392</span>
+                        <span class="tag-badge">PF00501 (AMP-binding)</span>
+                    </div>
+                    <div class="viz-img-wrap" onclick="openModal('results/figures/top_pfam_domains.png', 'Top Pfam Domains in DE Transcripts')">
+                        <img src="results/figures/top_pfam_domains.png" alt="Top Pfam Domains">
+                    </div>
+                </div>
+                <div class="viz-actions">
+                    <a href="results/figures/top_pfam_domains.png" target="_blank" class="action-btn">
+                        <i class="fa-solid fa-expand"></i> View High-Res
+                    </a>
+                    <a href="results/tables/csv/top_pfam_domains.csv" download class="action-btn secondary">
+                        <i class="fa-solid fa-file-csv"></i> Pfam Table (.csv)
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ================= Tier 4 ================= -->
+        <div class="section-header" id="tier-4">
+            <div class="section-title-wrap">
+                <span class="tier-badge tier-4-badge">Tier 4</span>
+                <h2 class="section-title">Isoform Switching & Deliverables Directory</h2>
+            </div>
+            <p class="section-desc">Interactive tabular exploration of candidate alternative splicing switches and direct deliverable downloads.</p>
+        </div>
+
+        <!-- Interactive Isoform Switching Table -->
+        <div class="table-card">
+            <div class="table-controls">
+                <div>
+                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;">Candidate Isoform Switching Genes (n=228)</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">Genes exhibiting condition-dependent shifts in the highest-expressed dominant isoform.</p>
+                </div>
+                <input type="text" id="geneSearch" class="search-input" placeholder="Search gene or transcript ID..." onkeyup="filterTable()">
+            </div>
+            <div class="table-responsive">
+                <table id="isoformTable">
+                    <thead>
+                        <tr>
+                            <th>Gene ID</th>
+                            <th>Dominant Isoform (AZ1)</th>
+                            <th>Dominant Isoform (AZ2)</th>
+                            <th>Dominant Isoform (AZ3)</th>
+                            <th>AZ1 TMM</th>
+                            <th>AZ2 TMM</th>
+                            <th>AZ3 TMM</th>
+                            <th>Switch Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="code-cell">TRINITY_DN696364_c0_g2</td>
+                            <td class="code-cell">..._i15</td>
+                            <td class="code-cell">..._i10</td>
+                            <td class="code-cell">..._i9</td>
+                            <td>3.27</td>
+                            <td>7.40</td>
+                            <td><strong>200.38</strong></td>
+                            <td><span class="status-pill pill-warning">AZ3 Switch</span></td>
+                        </tr>
+                        <tr>
+                            <td class="code-cell">TRINITY_DN695985_c2_g1</td>
+                            <td class="code-cell">..._i20</td>
+                            <td class="code-cell">..._i20</td>
+                            <td class="code-cell">..._i6</td>
+                            <td>5.35</td>
+                            <td>11.70</td>
+                            <td><strong>62.14</strong></td>
+                            <td><span class="status-pill pill-warning">AZ3 Switch</span></td>
+                        </tr>
+                        <tr>
+                            <td class="code-cell">TRINITY_DN698466_c1_g1</td>
+                            <td class="code-cell">..._i1</td>
+                            <td class="code-cell">..._i4</td>
+                            <td class="code-cell">..._i26</td>
+                            <td>11.03</td>
+                            <td><strong>53.07</strong></td>
+                            <td>35.64</td>
+                            <td><span class="status-pill pill-warning">3-Way Switch</span></td>
+                        </tr>
+                        <tr>
+                            <td class="code-cell">TRINITY_DN695934_c2_g1</td>
+                            <td class="code-cell">..._i17</td>
+                            <td class="code-cell">..._i14</td>
+                            <td class="code-cell">..._i7</td>
+                            <td>2.66</td>
+                            <td><strong>23.40</strong></td>
+                            <td>4.70</td>
+                            <td><span class="status-pill pill-warning">AZ2 Switch</span></td>
+                        </tr>
+                        <tr>
+                            <td class="code-cell">TRINITY_DN689760_c0_g1</td>
+                            <td class="code-cell">..._i19</td>
+                            <td class="code-cell">..._i10</td>
+                            <td class="code-cell">..._i10</td>
+                            <td>2.15</td>
+                            <td><strong>12.90</strong></td>
+                            <td>4.86</td>
+                            <td><span class="status-pill pill-warning">AZ2/AZ3 Shift</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+                <a href="results/tables/csv/isoform_switching_candidates.csv" download class="action-btn">
+                    <i class="fa-solid fa-download"></i> Download Full Isoform Switching Table (228 Candidates)
+                </a>
+            </div>
+        </div>
+
+        <!-- Master Deliverables Table -->
+        <div class="table-card" id="deliverables">
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">Master Deliverables Directory</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">Direct access to all generated differential expression matrices, statistics, and functional tables.</p>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Deliverable Description</th>
+                            <th>Analysis Module</th>
+                            <th>Format</th>
+                            <th>Direct Downloads</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>AZ1 vs AZ2 Differential Expression</strong></td>
+                            <td>edgeR Gene & Isoform DE</td>
+                            <td>CSV / TSV</td>
+                            <td>
+                                <a href="results/tables/csv/AZ1_vs_AZ2_gene_DE_results.csv" download class="action-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Gene CSV</a>
+                                <a href="results/tables/csv/AZ1_vs_AZ2_isoform_DE_results.csv" download class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Isoform CSV</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>AZ1 vs AZ3 Differential Expression</strong></td>
+                            <td>edgeR Gene & Isoform DE</td>
+                            <td>CSV / TSV</td>
+                            <td>
+                                <a href="results/tables/csv/AZ1_vs_AZ3_gene_DE_results.csv" download class="action-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Gene CSV</a>
+                                <a href="results/tables/csv/AZ1_vs_AZ3_isoform_DE_results.csv" download class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Isoform CSV</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>AZ2 vs AZ3 Differential Expression</strong></td>
+                            <td>edgeR Gene & Isoform DE</td>
+                            <td>CSV / TSV</td>
+                            <td>
+                                <a href="results/tables/csv/AZ2_vs_AZ3_gene_DE_results.csv" download class="action-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Gene CSV</a>
+                                <a href="results/tables/csv/AZ2_vs_AZ3_isoform_DE_results.csv" download class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Isoform CSV</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>DE Genes TMM Expression Matrix</strong></td>
+                            <td>Normalized Matrix</td>
+                            <td>CSV / TSV</td>
+                            <td>
+                                <a href="results/tables/csv/de_genes_expression_matrix.csv" download class="action-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Matrix CSV</a>
+                                <a href="results/tables/tsv/de_genes_expression_matrix.tsv" download class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Matrix TSV</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trinotate Functional Annotation Report</strong></td>
+                            <td>SwissProt, Pfam, GO, Rfam</td>
+                            <td>Excel / TSV</td>
+                            <td>
+                                <a href="data/annotation/trinotate_DE_annotation_report.xls" download class="action-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Master Report (.xls)</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pairwise Volcano & MA Plots</strong></td>
+                            <td>edgeR Graphical Plots</td>
+                            <td>Vector PDF</td>
+                            <td>
+                                <a href="data/differential_expression/gene_level/trinity_matrix.gene.counts.matrix.AZ1_vs_AZ2.edgeR.DE_results.MA_n_Volcano.pdf" target="_blank" class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">AZ1 vs AZ2 PDF</a>
+                                <a href="data/differential_expression/gene_level/trinity_matrix.gene.counts.matrix.AZ1_vs_AZ3.edgeR.DE_results.MA_n_Volcano.pdf" target="_blank" class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">AZ1 vs AZ3 PDF</a>
+                                <a href="data/differential_expression/gene_level/trinity_matrix.gene.counts.matrix.AZ2_vs_AZ3.edgeR.DE_results.MA_n_Volcano.pdf" target="_blank" class="action-btn secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">AZ2 vs AZ3 PDF</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Image Lightbox Modal -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modalImg" alt="Enlarged Plot">
+    </div>
+
+    <footer>
+        <p>
+            <strong>De Novo RNA-Seq Analysis Suite</strong> | Built with Trinity, Salmon, edgeR, and Trinotate.<br>
+            Source repository: <a href="https://github.com/Angsumi/RNA_DE_Novo_Analysis" target="_blank">Angsumi/RNA_DE_Novo_Analysis</a>
+        </p>
+    </footer>
+
+    <script>
+        function openModal(src, title) {
+            const modal = document.getElementById('imageModal');
+            const img = document.getElementById('modalImg');
+            img.src = src;
+            img.alt = title;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        function filterTable() {
+            const input = document.getElementById('geneSearch');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('isoformTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                const tdGene = tr[i].getElementsByTagName('td')[0];
+                if (tdGene) {
+                    const txtValue = tdGene.textContent || tdGene.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = '';
+                    } else {
+                        tr[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

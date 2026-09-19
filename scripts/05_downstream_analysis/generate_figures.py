@@ -4,16 +4,26 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib_venn import venn3
+try:
+    from matplotlib_venn import venn3
+    VENN_AVAILABLE = True
+except ImportError:
+    VENN_AVAILABLE = False
 
-# Set directories
-base_dir = '/home/angsuman/rna_pipeline/trinity_output'
-de_dir = os.path.join(base_dir, 'edgeR_gene_dir')
-report_file = os.path.join(base_dir, 'trinotate_DE_annotation_report.xls')
-tmm_file = '/home/angsuman/rna_pipeline/trinity_output/trinity_matrix.gene.TMM.EXPR.matrix'
+from pathlib import Path
 
-os.makedirs(os.path.join(base_dir, 'figures'), exist_ok=True)
-fig_dir = os.path.join(base_dir, 'figures')
+# Resolve repository root directory
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+de_dir = REPO_ROOT / 'data' / 'differential_expression' / 'gene_level'
+report_file = REPO_ROOT / 'data' / 'annotation' / 'trinotate_DE_annotation_report.xls'
+fig_dir = REPO_ROOT / 'results' / 'figures'
+os.makedirs(fig_dir, exist_ok=True)
+
+# Expression matrix: check external matrix first, fallback to repository table
+tmm_file = Path('/home/angsuman/rna_pipeline/trinity_output/trinity_matrix.gene.TMM.EXPR.matrix')
+if not tmm_file.exists():
+    tmm_file = REPO_ROOT / 'results' / 'tables' / 'tsv' / 'de_genes_expression_matrix.tsv'
 
 # 1. Generate Venn Diagram
 print("Generating Venn Diagram...")
@@ -34,12 +44,15 @@ for comp, fname in de_files.items():
     else:
         de_sets[comp] = set()
 
-plt.figure(figsize=(8, 8))
-venn3(subsets=[de_sets['AZ1_vs_AZ2'], de_sets['AZ1_vs_AZ3'], de_sets['AZ2_vs_AZ3']],
-      set_labels=('AZ1 vs AZ2', 'AZ1 vs AZ3', 'AZ2 vs AZ3'))
-plt.title('Differentially Expressed Genes Overlap (FDR < 0.05)', fontsize=14, fontweight='bold')
-plt.savefig(os.path.join(fig_dir, 'de_overlap_venn.png'), dpi=300, bbox_inches='tight')
-plt.close()
+if VENN_AVAILABLE:
+    plt.figure(figsize=(8, 8))
+    venn3(subsets=[de_sets['AZ1_vs_AZ2'], de_sets['AZ1_vs_AZ3'], de_sets['AZ2_vs_AZ3']],
+          set_labels=('AZ1 vs AZ2', 'AZ1 vs AZ3', 'AZ2 vs AZ3'))
+    plt.title('Differentially Expressed Genes Overlap (FDR < 0.05)', fontsize=14, fontweight='bold')
+    plt.savefig(os.path.join(fig_dir, 'de_overlap_venn.png'), dpi=300, bbox_inches='tight')
+    plt.close()
+else:
+    print("Warning: 'matplotlib_venn' not found. Skipping Venn diagram generation.")
 
 # 2. Generate Heatmap
 print("Generating Heatmap...")
@@ -117,8 +130,7 @@ if os.path.exists(report_file):
             plt.close()
 
 # 4. Generate BUSCO Plot
-print("Generating BUSCO Plot...")
-busco_summary = '/home/angsuman/rna_pipeline/trinity_output/busco_results/short_summary.specific.eukaryota_odb12.2.busco_results.txt'
+busco_summary = REPO_ROOT / 'data' / 'qc' / 'busco_results' / 'short_summary.specific.eukaryota_odb12.2.busco_results.txt'
 if os.path.exists(busco_summary):
     with open(busco_summary, 'r') as f:
         content = f.read()

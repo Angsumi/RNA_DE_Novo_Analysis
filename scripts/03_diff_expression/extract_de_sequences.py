@@ -1,9 +1,12 @@
 import os
+from pathlib import Path
 
-de_dir = '/home/angsuman/rna_pipeline/trinity_output/edgeR_gene_dir'
-trans_map_file = '/home/angsuman/rna_pipeline/trinity_output/Trinity.fasta.gene_trans_map'
-fasta_file = '/home/angsuman/rna_pipeline/trinity_output/Trinity.fasta'
-output_fasta = '/home/angsuman/rna_pipeline/trinity_output/Trinity_DE_subset.fasta'
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+de_dir = REPO_ROOT / 'data' / 'differential_expression' / 'gene_level'
+trans_map_file = Path('/home/angsuman/rna_pipeline/trinity_output/Trinity.fasta.gene_trans_map')
+fasta_file = Path('/home/angsuman/rna_pipeline/trinity_output/Trinity.fasta')
+output_fasta = Path('/home/angsuman/rna_pipeline/trinity_output/Trinity_DE_subset.fasta')
 
 # 1. Collect DE gene IDs with FDR < 0.05
 de_genes = set()

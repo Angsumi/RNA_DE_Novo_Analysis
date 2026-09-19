@@ -3,15 +3,23 @@ import re
 import pandas as pd
 import numpy as np
 
-# Set directories
-base_dir = '/home/angsuman/rna_pipeline/trinity_output'
-de_dir = os.path.join(base_dir, 'edgeR_gene_dir')
-report_file = os.path.join(base_dir, 'trinotate_DE_annotation_report.xls')
-gene_tmm_file = '/home/angsuman/rna_pipeline/trinity_output/trinity_matrix.gene.TMM.EXPR.matrix'
-busco_summary = '/home/angsuman/rna_pipeline/trinity_output/busco_results/short_summary.specific.eukaryota_odb12.2.busco_results.txt'
+from pathlib import Path
 
-tables_dir = os.path.join(base_dir, 'tables')
+# Resolve repository root directory
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+de_dir = REPO_ROOT / 'data' / 'differential_expression' / 'gene_level'
+report_file = REPO_ROOT / 'data' / 'annotation' / 'trinotate_DE_annotation_report.xls'
+busco_summary = REPO_ROOT / 'data' / 'qc' / 'busco_results' / 'short_summary.specific.eukaryota_odb12.2.busco_results.txt'
+
+gene_tmm_file = Path('/home/angsuman/rna_pipeline/trinity_output/trinity_matrix.gene.TMM.EXPR.matrix')
+if not gene_tmm_file.exists():
+    gene_tmm_file = REPO_ROOT / 'results' / 'tables' / 'tsv' / 'de_genes_expression_matrix.tsv'
+
+tables_dir = REPO_ROOT / 'results' / 'tables' / 'tsv'
+csv_dir = REPO_ROOT / 'results' / 'tables' / 'csv'
 os.makedirs(tables_dir, exist_ok=True)
+os.makedirs(csv_dir, exist_ok=True)
 
 # 1. Venn Diagram overlap counts csv
 print("Saving Venn overlaps...")
@@ -46,15 +54,19 @@ venn_data = {
         len(a12 & a13 & a23), len(a12 | a13 | a23)
     ]
 }
-pd.DataFrame(venn_data).to_csv(os.path.join(tables_dir, 'de_overlap_counts.tsv'), sep='\t', index=False)
+def save_table(df, name, index=False):
+    df.to_csv(os.path.join(tables_dir, f"{name}.tsv"), sep='\t', index=index)
+    df.to_csv(os.path.join(csv_dir, f"{name}.csv"), sep=',', index=index)
 
-# 2. Clustered Heatmap raw TMM values csv
+save_table(pd.DataFrame(venn_data), 'de_overlap_counts', index=False)
+
+# 2. Clustered Heatmap raw TMM values
 print("Saving Heatmap raw data...")
 all_de_genes = a12.union(a13).union(a23)
 if os.path.exists(gene_tmm_file) and len(all_de_genes) > 0:
     tmm_df = pd.read_csv(gene_tmm_file, sep='\t', index_col=0)
     de_tmm = tmm_df.loc[tmm_df.index.intersection(all_de_genes)]
-    de_tmm.to_csv(os.path.join(tables_dir, 'de_genes_expression_matrix.tsv'), sep='\t')
+    save_table(de_tmm, 'de_genes_expression_matrix', index=True)
 
 # 3. Pfam and GO top categories csvs
 print("Saving Pfam & GO Top lists...")
@@ -75,7 +87,7 @@ if os.path.exists(report_file):
     if pfams:
         pfam_df = pd.DataFrame(pfams, columns=['Pfam_ID', 'Domain_Description'])
         pfam_counts = pfam_df.value_counts().head(30).reset_index(name='Counts')
-        pfam_counts.to_csv(os.path.join(tables_dir, 'top_pfam_domains.tsv'), sep='\t', index=False)
+        save_table(pfam_counts, 'top_pfam_domains', index=False)
 
     # GO categories
     go_terms = []
@@ -91,7 +103,7 @@ if os.path.exists(report_file):
     if go_terms:
         go_df = pd.DataFrame(go_terms, columns=['GO_ID', 'Ontology', 'Term_Description'])
         go_counts = go_df.value_counts().head(30).reset_index(name='Counts')
-        go_counts.to_csv(os.path.join(tables_dir, 'top_go_categories.tsv'), sep='\t', index=False)
+        save_table(go_counts, 'top_go_categories', index=False)
 
 # 4. BUSCO completeness csv
 print("Saving BUSCO percentages...")
@@ -106,7 +118,7 @@ if os.path.exists(busco_summary):
             'Orthologs_Count': [int(round(s_pct * n_val / 100)), int(round(d_pct * n_val / 100)), int(round(f_pct * n_val / 100)), int(round(m_pct * n_val / 100))],
             'Percentage': [s_pct, d_pct, f_pct, m_pct]
         }
-        pd.DataFrame(busco_data).to_csv(os.path.join(tables_dir, 'busco_completeness_percentages.tsv'), sep='\t', index=False)
+        save_table(pd.DataFrame(busco_data), 'busco_completeness_percentages', index=False)
 
 # 5. Top 6 Candidate genes expressions csv
 print("Saving top candidate genes expression profiles...")
@@ -131,6 +143,6 @@ for g in lowest_fdr_genes:
 if len(top_6_genes) == 6 and os.path.exists(gene_tmm_file):
     tmm_df = pd.read_csv(gene_tmm_file, sep='\t', index_col=0)
     top_6_tmm = tmm_df.loc[top_6_genes]
-    top_6_tmm.to_csv(os.path.join(tables_dir, 'top_candidate_genes_expression.tsv'), sep='\t')
+    save_table(top_6_tmm, 'top_candidate_genes_expression', index=True)
 
 print("All CSV raw data tables generated successfully!")

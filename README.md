@@ -1,58 +1,62 @@
 # De Novo RNA-Seq Transcriptome Assembly and Downstream Analysis
 
-This repository contains the complete processed results, scientific figures, parsed CSV tables, and reproducible scripts from the de novo transcriptome assembly and differential expression workflow executed on the GCE virtual machine `rna-denovo-vm`.
+This repository contains the complete processed results, publication-ready scientific figures, parsed CSV/TSV tables, and reproducible scripts from the de novo transcriptome assembly, differential expression, and functional annotation workflow across three conditions/timepoints (**AZ1**, **AZ2**, **AZ3**).
 
 ---
 
 ## 📂 Repository Structure
 
-The data in this repository is structured as follows:
-
 ```
 RNA_DE_Novo_Analysis/
-├── README.md                              # This detailed workflow documentation
-├── TrinityStats.txt                      # Contig length distribution and N50 statistics
-├── de_samples.txt                        # edgeR sample relationship matrix
-├── trinotate_DE_annotation_report.xls     # Full Excel sheet of DE genes functional annotation
+├── README.md                          # Master project documentation
+├── requirements.txt                   # Python package dependencies
+├── environment.yml                    # Conda environment definition
 │
-├── figures/                              # Publication-ready plots (.png)
-│   ├── busco_completeness.png            # Assembly ortholog completeness stacked bar chart
-│   ├── de_overlap_venn.png               # 3-way Venn diagram of DE gene overlaps
-│   ├── de_heatmap.png                    # Hierarchical clustering heatmap of 432 DE genes
-│   ├── pca_plot.png                      # Principal Component Analysis (PCA) of samples
-│   ├── candidate_genes_expression.png    # Expression profiles of top 6 candidate genes
-│   ├── top_go_categories.png             # Top 15 most frequent Gene Ontology (GO) terms
-│   └── top_pfam_domains.png              # Top 15 most frequent Pfam domain designations
+├── scripts/                           # Modular workflow scripts organized by stage
+│   ├── 01_assembly/                   # Trinity de novo assembly scripts
+│   │   ├── run_trinity_norm.sh
+│   │   ├── run_trinity_norm_12cpu.sh
+│   │   └── run_trinity_norm_12cpu_fix.sh
+│   ├── 02_quantification/            # Salmon pseudoalignment & abundance estimation
+│   │   └── run_salmon_manual.sh
+│   ├── 03_diff_expression/          # edgeR DE analysis & FASTA subsetting
+│   │   ├── run_de_analysis_no_replicates.sh
+│   │   └── extract_de_sequences.py
+│   ├── 04_annotation/               # Functional annotation (Trinotate, TransDecoder, DIAMOND, HMMER)
+│   │   ├── run_trinotate.sh
+│   │   └── run_trinotate_subset.sh
+│   ├── 05_downstream_analysis/      # Data mining, publication plotting & table export
+│   │   ├── additional_analyses.py    # PCA, KEGG pathways, TF classification, isoform switches
+│   │   ├── generate_figures.py       # High-res publication figure generation
+│   │   └── generate_csv_data.py      # Dual TSV and CSV tabular compilation
+│   └── pipeline_orchestration/       # Monitoring and multi-step pipeline runners
+│       ├── run_downstream.sh
+│       └── run_downstream_all.sh
 │
-├── csv_data/                             # Comma-Separated Values (CSV) of all figures & results
-│   ├── AZ1_vs_AZ2_gene_DE_results.csv     # Pairwise gene differential expression values (logFC, FDR)
-│   ├── AZ1_vs_AZ3_gene_DE_results.csv     #
-│   ├── AZ2_vs_AZ3_gene_DE_results.csv     #
-│   ├── AZ1_vs_AZ2_isoform_DE_results.csv  # Pairwise transcript-level DE values (logFC, FDR)
-│   ├── AZ1_vs_AZ3_isoform_DE_results.csv  #
-│   ├── AZ2_vs_AZ3_isoform_DE_results.csv  #
-│   ├── busco_completeness_percentages.csv # Raw percentages/counts for BUSCO chart
-│   ├── de_overlap_counts.csv              # Exact overlaps counts for the Venn diagram
-│   ├── de_genes_expression_matrix.csv     # Clean matrix of TMM expression values for the 432 DE genes
-│   ├── isoform_switching_candidates.csv   # List of 228 genes showing isoform switching
-│   ├── pca_coordinates.csv                # PC1 and PC2 coordinates of samples
-│   ├── top_candidate_genes_expression.csv # Expressions of top 6 candidate genes
-│   ├── top_go_categories.csv              # Counts/descriptions for the GO term bar chart
-│   └── top_pfam_domains.csv               # Counts/descriptions for the Pfam domains chart
+├── data/                             # Processed data, statistics & annotations
+│   ├── qc/                           # Assembly quality & completeness assessment
+│   │   ├── TrinityStats.txt          # N50, GC content, length distribution
+│   │   └── busco_results/            # BUSCO v6.1.0 (eukaryota_odb12.2) benchmarking summaries
+│   │       ├── short_summary.specific.eukaryota_odb12.2.busco_results.json
+│   │       └── short_summary.specific.eukaryota_odb12.2.busco_results.txt
+│   ├── annotation/                   # Comprehensive functional annotation outputs
+│   │   └── trinotate_DE_annotation_report.xls
+│   └── differential_expression/      # Count matrices, DE results & volcano plots
+│       ├── gene_level/               # Gene-level edgeR comparisons (.DE_results, .pdf, .Rscript)
+│       └── isoform_level/            # Transcript-level edgeR comparisons
 │
-└── Scripts_and_Logs/                     # Automation scripts and run console logs
-    ├── run_trinity_norm_12cpu_fix.sh     # Trinity de novo assembler run script
-    ├── run_salmon_manual.sh              # Salmon abundance quantification automation script
-    ├── run_de_analysis_no_replicates.sh  # edgeR differential expression automation script
-    ├── run_trinotate_subset.sh           # Patched Trinotate subset annotation pipeline script
-    ├── extract_de_sequences.py           # Custom Python script to identify and extract DE sequences
-    ├── generate_figures.py               # Python visualization pipeline script
-    ├── generate_csv_data.py              # Python script compiling TSV/CSV raw tables
-    ├── additional_analyses.py            # Python script executing PCA, TFs, candidate expression
-    ├── downstream_run.log                # Master downstream analysis execution log
-    ├── de_analysis.log                   # edgeR execution console log
-    ├── trinotate_subset.log              # Database building & annotation compilation log
-    └── infernal.log                      # cmscan Rfam non-coding RNA search log
+└── results/                          # Final deliverables
+    ├── figures/                      # High-resolution (300 DPI) publication figures (.png)
+    │   ├── busco_completeness.png    # BUSCO ortholog completeness assessment
+    │   ├── de_overlap_venn.png       # 3-way Venn diagram of DE gene overlaps
+    │   ├── de_heatmap.png            # Hierarchical clustering heatmap of 432 DE genes
+    │   ├── pca_plot.png              # Principal Component Analysis (PCA) of samples
+    │   ├── candidate_genes_expression.png # Expression profiles of top 6 candidate genes
+    │   ├── top_go_categories.png     # Top 15 most frequent Gene Ontology (GO) terms
+    │   └── top_pfam_domains.png      # Top 15 most frequent Pfam domains
+    └── tables/                       # Processed tabular deliverables
+        ├── csv/                      # Comma-Separated Values (for Excel, R, Python)
+        └── tsv/                      # Tab-Separated Values (for UNIX pipelines, Prism)
 ```
 
 ---
@@ -67,16 +71,16 @@ RNA_DE_Novo_Analysis/
 * **Assembly Completeness (BUSCO)**: 68.0% Complete (85/125 orthologs), 28.8% Fragmented (36/125), 3.2% Missing (4/125).
 
 ### 2. Abundance Estimation (Salmon)
-* Abundance quantification mapped raw reads back to the assembled contigs:
+* Abundance quantification mapped raw reads back to assembled contigs:
   * **AZ1**: 80.37% alignment rate (10.75M mapped reads)
   * **AZ2**: 79.47% alignment rate (10.78M mapped reads)
   * **AZ3**: 80.28% alignment rate (6.73M mapped reads)
 
-### 3. Differential Expression (edgeR)
+### 3. Differential Expression (edgeR without replicates)
 * Pairwise DE genes identified at FDR < 0.05 (dispersion fixed at 0.1):
-  * **AZ1 vs AZ2**: 993 genes (441 with |logFC| > 2)
-  * **AZ1 vs AZ3**: 1,103 genes (417 with |logFC| > 2)
-  * **AZ2 vs AZ3**: 839 genes (453 with |logFC| > 2)
+  * **AZ1 vs AZ2**: 993 genes (441 with |log2FC| > 2)
+  * **AZ1 vs AZ3**: 1,103 genes (417 with |log2FC| > 2)
+  * **AZ2 vs AZ3**: 839 genes (453 with |log2FC| > 2)
 * A union of **432 unique differentially expressed genes** (mapping to 2,840 transcripts) was extracted for downstream annotation.
 
 ### 4. Functional Annotation (Trinotate)
@@ -85,12 +89,40 @@ RNA_DE_Novo_Analysis/
   * Homologous proteins annotated by **DIAMOND** blastp (against SwissProt).
   * Functional domains annotated by **HMMER** (against Pfam).
   * Non-coding RNAs scanned by **Infernal (cmscan)** (against Rfam).
-* Compiled into the comprehensive report sheet `trinotate_DE_annotation_report.xls`.
+* Compiled into the comprehensive report sheet `data/annotation/trinotate_DE_annotation_report.xls`.
 
 ---
 
-## 🛠 How to Use the Raw CSV Data
-All files in `csv_data/` are standard Comma-Separated Values (CSV). You can open them directly in:
-* **Microsoft Excel** or **Google Sheets** for sorting and custom filtering.
-* **GraphPad Prism** or **OriginPro** for plotting.
-* **R** (`read.csv()`) or **Python** (`pandas.read_csv()`) for advanced statistics and custom clustering.
+## 🚀 Quickstart & Reproducibility
+
+### 1. Environment Setup
+
+Using conda:
+```bash
+conda env create -f environment.yml
+conda activate rna_downstream
+```
+
+Or using pip:
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Regenerate Figures and Tables
+
+All downstream analysis scripts use repository-relative paths and run standalone:
+
+```bash
+# 1. Regenerate all publication figures (.png)
+python scripts/05_downstream_analysis/generate_figures.py
+
+# 2. Re-export all TSV and CSV tables
+python scripts/05_downstream_analysis/generate_csv_data.py
+
+# 3. Re-run PCA, TF classification, KEGG pathways, and isoform switching analysis
+python scripts/05_downstream_analysis/additional_analyses.py
+```
+
+### 3. Accessing Results
+- Figures are stored in [`results/figures/`](results/figures/).
+- Tables are stored in [`results/tables/csv/`](results/tables/csv/) and [`results/tables/tsv/`](results/tables/tsv/).
